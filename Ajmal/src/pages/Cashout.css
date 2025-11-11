@@ -1,0 +1,370 @@
+/* ========================================
+   CASHOUT PAGE - Sleek & Modern Design
+   ======================================== */
+
+.cashout-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fafbfc;
+  padding-bottom: 70px;
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+
+.cashout-header {
+  background: linear-gradient(135deg, var(--secondary-600) 0%, var(--secondary-800) 100%);
+  color: var(--color-text-inverse);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  opacity: 0.8;
+}
+
+.cashout-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-inverse);
+  letter-spacing: -0.02em;
+}
+
+.language-toggle-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 16px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.language-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.language-icon {
+  font-size: 13px;
+}
+
+/* ========================================
+   MAIN CONTENT
+   ======================================== */
+
+.cashout-main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.cashout-content {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cashout-content.rtl {
+  direction: rtl;
+}
+
+/* ========================================
+   BALANCE DISPLAY
+   ======================================== */
+
+.balance-display {
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.balance-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.balance-amount {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.02em;
+}
+
+/* ========================================
+   INFO CARD
+   ======================================== */
+
+.info-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.info-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.info-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.01em;
+}
+
+.info-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 0 0 16px 0;
+}
+
+.cashout-content.rtl .info-text {
+  font-size: 15px;
+}
+
+.info-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.info-badge {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.info-badge.success {
+  background: #d1fae5;
+  border-color: #6ee7b7;
+  color: #065f46;
+}
+
+.badge-icon {
+  font-size: 14px;
+}
+
+/* ========================================
+   CASHOUT FORM
+   ======================================== */
+
+.cashout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: -0.01em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 11px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-group select {
+  cursor: pointer;
+}
+
+.error-text {
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* ========================================
+   SUBMIT BUTTON
+   ======================================== */
+
+.submit-btn {
+  background: linear-gradient(135deg, var(--secondary-600) 0%, var(--secondary-700) 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 8px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   BOTTOM NAVIGATION
+   ======================================== */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+  z-index: var(--z-fixed);
+  border-top: 1px solid #e5e7eb;
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 8px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  flex: 1;
+  max-width: 70px;
+}
+
+.nav-item:hover {
+  color: var(--color-primary);
+  background: rgba(0, 188, 212, 0.06);
+}
+
+.nav-item.active {
+  color: var(--color-secondary);
+  background: rgba(255, 152, 0, 0.1);
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 20px;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (min-width: 640px) {
+  .cashout-content {
+    max-width: 520px;
+    padding: 24px 20px;
+  }
+
+  .balance-display {
+    padding: 24px;
+  }
+
+  .balance-amount {
+    font-size: 36px;
+  }
+
+  .info-card {
+    padding: 24px;
+  }
+
+  .info-icon {
+    font-size: 48px;
+  }
+}
+
+@media (max-width: 360px) {
+  .balance-amount {
+    font-size: 28px;
+  }
+
+  .info-text {
+    font-size: 13px;
+  }
+
+  .info-badge {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+}

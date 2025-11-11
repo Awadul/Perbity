@@ -1,0 +1,450 @@
+/* ========================================
+   INVITE PAGE - Sleek & Modern Minimal Design
+   ======================================== */
+
+.invite-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fafbfc;
+  padding-bottom: 70px;
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+
+.invite-header {
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-800) 100%);
+  color: var(--color-text-inverse);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  opacity: 0.8;
+}
+
+.invite-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-inverse);
+  letter-spacing: -0.02em;
+}
+
+.header-spacer {
+  width: 32px;
+}
+
+/* ========================================
+   MAIN CONTENT
+   ======================================== */
+
+.invite-main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.invite-content {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ========================================
+   HERO SECTION
+   ======================================== */
+
+.invite-hero {
+  text-align: center;
+  padding: 24px 16px;
+  background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
+  border-radius: 16px;
+}
+
+.hero-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: bounce 2.5s ease-in-out infinite;
+}
+
+.invite-hero h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.invite-hero p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ========================================
+   REFERRAL STATS
+   ======================================== */
+
+.referral-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.01em;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ========================================
+   REFERRED INFO
+   ======================================== */
+
+.referred-info {
+  background: linear-gradient(135deg, #fef3e2 0%, #fff7ed 100%);
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.referred-label {
+  font-size: 12px;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.referred-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #78350f;
+  letter-spacing: -0.01em;
+}
+
+/* ========================================
+   REFERRAL LINK SECTION
+   ======================================== */
+
+.referral-link-section h3,
+.share-section h3,
+.how-it-works h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.01em;
+}
+
+.referral-link-box {
+  display: flex;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 6px;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.referral-input {
+  flex: 1;
+  border: none;
+  padding: 8px 10px;
+  font-size: 13px;
+  background: transparent;
+  outline: none;
+  color: var(--color-text-primary);
+}
+
+.copy-btn {
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.copy-btn:hover {
+  transform: scale(1.02);
+}
+
+.copy-btn.copied {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* ========================================
+   SHARE SECTION
+   ======================================== */
+
+.share-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.share-btn {
+  background: #ffffff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.share-btn.whatsapp:hover {
+  border-color: #25d366;
+  background: #f0fdf4;
+}
+
+.share-btn.email:hover {
+  border-color: var(--color-primary);
+  background: #ecfeff;
+}
+
+.share-icon {
+  font-size: 32px;
+}
+
+.share-btn span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* ========================================
+   HOW IT WORKS
+   ======================================== */
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.01em;
+}
+
+.step-content p {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ========================================
+   BOTTOM NAVIGATION
+   ======================================== */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+  z-index: var(--z-fixed);
+  border-top: 1px solid #e5e7eb;
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 8px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  flex: 1;
+  max-width: 70px;
+}
+
+.nav-item:hover {
+  color: var(--color-primary);
+  background: rgba(0, 188, 212, 0.06);
+}
+
+.nav-item.active {
+  color: var(--color-primary);
+  background: rgba(0, 188, 212, 0.1);
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 20px;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (min-width: 640px) {
+  .invite-content {
+    max-width: 520px;
+    padding: 24px 20px;
+  }
+
+  .invite-hero {
+    padding: 32px 24px;
+  }
+
+  .hero-icon {
+    font-size: 64px;
+  }
+
+  .invite-hero h2 {
+    font-size: 26px;
+  }
+
+  .invite-hero p {
+    font-size: 15px;
+  }
+
+  .referral-stats {
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 18px 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .stat-value {
+    font-size: 14px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+}

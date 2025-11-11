@@ -1,0 +1,219 @@
+/* ========================================
+   INPUT COMPONENT - Contrasting Design
+   ======================================== */
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  width: 100%;
+}
+
+.input-group label {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+@media (min-width: 640px) {
+  .input-group label {
+    font-size: var(--font-size-base);
+  }
+}
+
+.input-group .required {
+  color: var(--error);
+  margin-left: var(--spacing-1);
+  font-size: var(--font-size-base);
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select {
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  transition: var(--transition-all);
+  font-family: var(--font-family-sans);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  width: 100%;
+  line-height: var(--line-height-normal);
+  min-height: 44px; /* Touch-friendly */
+}
+
+@media (min-width: 640px) {
+  .input-group input,
+  .input-group textarea,
+  .input-group select {
+    padding: var(--spacing-4) var(--spacing-5);
+  }
+}
+
+.input-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.input-group input::placeholder,
+.input-group textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
+}
+
+.input-group input:focus,
+.input-group textarea:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+  background-color: var(--color-bg-primary);
+}
+
+.input-group input.input-error,
+.input-group textarea.input-error,
+.input-group select.input-error {
+  border-color: var(--error);
+  background-color: var(--error-light);
+}
+
+.input-group input.input-error:focus,
+.input-group textarea.input-error:focus,
+.input-group select.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.input-group input.input-success,
+.input-group textarea.input-success,
+.input-group select.input-success {
+  border-color: var(--success);
+  background-color: var(--success-light);
+}
+
+.input-group input.input-success:focus,
+.input-group textarea.input-success:focus,
+.input-group select.input-success:focus {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.input-group input:disabled,
+.input-group textarea:disabled,
+.input-group select:disabled {
+  background-color: var(--color-bg-tertiary);
+  cursor: not-allowed;
+  opacity: 0.6;
+  color: var(--color-text-muted);
+}
+
+.input-group .error-message {
+  color: var(--error-dark);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  margin-top: calc(var(--spacing-1) * -1);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+@media (min-width: 640px) {
+  .input-group .error-message {
+    font-size: var(--font-size-sm);
+  }
+}
+
+.input-group .error-message::before {
+  content: '⚠';
+  font-size: var(--font-size-base);
+  flex-shrink: 0;
+}
+
+.input-group .success-message {
+  color: var(--success-dark);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  margin-top: calc(var(--spacing-1) * -1);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+@media (min-width: 640px) {
+  .input-group .success-message {
+    font-size: var(--font-size-sm);
+  }
+}
+
+.input-group .success-message::before {
+  content: '✓';
+  font-size: var(--font-size-base);
+  flex-shrink: 0;
+}
+
+.input-group .help-text {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  margin-top: calc(var(--spacing-1) * -1);
+}
+
+@media (min-width: 640px) {
+  .input-group .help-text {
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* Input with icon */
+.input-group.has-icon {
+  position: relative;
+}
+
+.input-group.has-icon input {
+  padding-left: var(--spacing-12);
+}
+
+.input-group .input-icon {
+  position: absolute;
+  left: var(--spacing-4);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+/* Size variants */
+.input-group.input-sm input,
+.input-group.input-sm textarea,
+.input-group.input-sm select {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  min-height: 36px;
+}
+
+.input-group.input-lg input,
+.input-group.input-lg textarea,
+.input-group.input-lg select {
+  padding: var(--spacing-5) var(--spacing-6);
+  font-size: var(--font-size-lg);
+  min-height: 52px;
+}
+
+/* Focus visible for accessibility */
+.input-group input:focus-visible,
+.input-group textarea:focus-visible,
+.input-group select:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .input-group input,
+  .input-group textarea,
+  .input-group select {
+    transition: none;
+  }
+}

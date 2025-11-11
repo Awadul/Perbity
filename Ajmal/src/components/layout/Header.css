@@ -1,0 +1,223 @@
+/* ========================================
+   HEADER COMPONENT - Contrasting Design
+   ======================================== */
+
+.header {
+  background: linear-gradient(135deg, var(--neutral-900) 0%, var(--neutral-800) 100%);
+  color: var(--color-text-inverse);
+  padding: var(--spacing-4) 0;
+  box-shadow: var(--shadow-lg);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+@media (min-width: 768px) {
+  .header {
+    padding: var(--spacing-5) 0;
+  }
+}
+
+.header-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .header-container {
+    padding: 0 var(--spacing-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-container {
+    padding: 0 var(--spacing-8);
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.logo h1 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 640px) {
+  .logo h1 {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+@media (min-width: 768px) {
+  .logo h1 {
+    font-size: var(--font-size-3xl);
+  }
+}
+
+.nav {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .nav ul {
+    gap: var(--spacing-4);
+  }
+}
+
+@media (min-width: 768px) {
+  .nav ul {
+    gap: var(--spacing-6);
+  }
+}
+
+.nav li {
+  margin: 0;
+}
+
+.nav a {
+  color: var(--color-text-inverse);
+  text-decoration: none;
+  transition: var(--transition-base);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  position: relative;
+  letter-spacing: 0.01em;
+}
+
+@media (min-width: 640px) {
+  .nav a {
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-base);
+  }
+}
+
+.nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  transition: width var(--transition-base);
+}
+
+.nav a:hover {
+  color: var(--color-primary);
+  background-color: rgba(0, 188, 212, 0.1);
+}
+
+.nav a:hover::after {
+  width: 80%;
+}
+
+.nav a.active {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  background-color: rgba(0, 188, 212, 0.1);
+}
+
+.nav a.active::after {
+  width: 80%;
+}
+
+.nav a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Mobile menu button */
+.mobile-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  padding: var(--spacing-2);
+  border-radius: var(--radius-md);
+  transition: var(--transition-base);
+}
+
+@media (max-width: 640px) {
+  .mobile-menu-button {
+    display: block;
+  }
+  
+  .nav {
+    display: none;
+  }
+  
+  .nav.mobile-open {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--neutral-900);
+    padding: var(--spacing-4);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .nav.mobile-open ul {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-2);
+  }
+  
+  .nav.mobile-open a {
+    display: block;
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+}
+
+.mobile-menu-button:hover {
+  background-color: rgba(0, 188, 212, 0.1);
+}
+
+.mobile-menu-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .nav a,
+  .nav a::after,
+  .mobile-menu-button {
+    transition: none;
+  }
+}
