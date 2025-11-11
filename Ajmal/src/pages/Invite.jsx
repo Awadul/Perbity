@@ -1,24 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser, isAuthenticated } from '../services/auth';
+import { useAppContext } from '../context/AppContext';
 import './Invite.css';
 
 const Invite = () => {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(null);
+  const { user, isAuthenticated } = useAppContext();
   const [copied, setCopied] = useState(false);
 
   // Check authentication on mount
   useEffect(() => {
-    if (!isAuthenticated()) {
+    if (!isAuthenticated || !user) {
       navigate('/login', { replace: true });
-    } else {
-      setCurrentUser(getCurrentUser());
     }
-  }, [navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const [userData] = useState({
-    username: currentUser?.username || 'Guest',
+    username: user?.name || 'Guest',
     referralLink: 'https://infinity-earn.pro/user/signup.php?ref=awa',
     totalReferrals: 0,
     activeReferrals: 0,

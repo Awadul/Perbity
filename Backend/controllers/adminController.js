@@ -110,10 +110,18 @@ export const getAllUsers = async (req, res, next) => {
           status: 'approved'
         }).populate('paymentPlan');
         
-        return {
-          ...user.toObject(),
-          activePayment: activePayment || null
-        };
+        // Format the response to match frontend expectations
+        const userObj = user.toObject();
+        if (activePayment) {
+          userObj.activePayment = {
+            ...activePayment.toObject(),
+            plan: activePayment.paymentPlan // Add plan alias for frontend compatibility
+          };
+        } else {
+          userObj.activePayment = null;
+        }
+        
+        return userObj;
       })
     );
     
@@ -236,6 +244,96 @@ export const updateUserStatus = async (req, res, next) => {
       success: true,
       message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
       data: user
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Toggle user active status
+// @route   PUT /api/admin/users/:id/toggle-status
+// @access  Private/Admin
+export const toggleUserStatus = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
+    
+    if (user.role === 'admin') {
+      return next(new ErrorResponse('Cannot modify admin user', 403));
+    }
+    
+    user.isActive = !user.isActive;
+    await user.save();
+    
+    res.status(200).json({
+      success: true,
+      message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
+      data: user
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Assign package to user
+// @route   POST /api/admin/assign-package
+// @access  Private/Admin
+export const assignPackage = async (req, res, next) => {
+  try {
+    const { userId, planId } = req.body;
+    
+    if (!userId || !planId) {
+      return next(new ErrorResponse('User ID and Plan ID are required', 400));
+    }
+    
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
+    
+    if (user.role === 'admin') {
+      return next(new ErrorResponse('Cannot assign package to admin', 403));
+    }
+    
+    // Find plan
+    const plan = await PaymentPlan.findById(planId);
+    if (!plan) {
+      return next(new ErrorResponse('Payment plan not found', 404));
+    }
+    
+    // Deactivate existing active payments for this user
+    await Payment.updateMany(
+      { user: userId, isActive: true },
+      { isActive: false, status: 'expired' }
+    );
+    
+    // Create new payment with approved status and active
+    const payment = await Payment.create({
+      user: userId,
+      paymentPlan: planId,
+      amount: plan.price,
+      paymentMethod: 'other', // Admin assignment
+      proofImage: null, // Not needed for admin assignment
+      transactionId: `ADMIN-${Date.now()}`, // Admin-generated transaction ID
+      status: 'approved',
+      isActive: true,
+      approvedBy: req.user.id,
+      approvedAt: new Date(),
+      activatedAt: new Date(),
+      expiresAt: new Date(Date.now() + plan.duration * 24 * 60 * 60 * 1000)
+    });
+    
+    await payment.populate('paymentPlan');
+    await payment.populate('user', 'name email');
+    
+    res.status(200).json({
+      success: true,
+      message: `${plan.name} package assigned to ${user.name} successfully`,
+      data: payment
     });
   } catch (error) {
     next(error);

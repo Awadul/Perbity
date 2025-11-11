@@ -3,6 +3,8 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Login from './pages/Login.jsx'
 import SignUp from './pages/Signup.jsx'
 import Dashboard from './pages/Dashboard.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
+import ViewAds from './pages/ViewAds.jsx'
 import Invite from './pages/Invite.jsx'
 import Cashout from './pages/Cashout.jsx'
 import BuyPlan from './pages/BuyPlan.jsx'
@@ -21,6 +23,8 @@ function App() {
         
         {/* Protected dashboard routes without layout (has its own structure) */}
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/view-ads" element={<ProtectedRoute><ViewAds /></ProtectedRoute>} />
         <Route path="/invite" element={<ProtectedRoute><Invite /></ProtectedRoute>} />
         <Route path="/cashout" element={<ProtectedRoute><Cashout /></ProtectedRoute>} />
         <Route path="/buy-plan" element={<ProtectedRoute><BuyPlan /></ProtectedRoute>} />

@@ -5,6 +5,8 @@ import {
   getUserDetails,
   togglePaymentStatus,
   updateUserStatus,
+  toggleUserStatus,
+  assignPackage,
   getPaymentPlans,
   createPaymentPlan,
   updatePaymentPlan,
@@ -24,6 +26,8 @@ router.get('/dashboard', getDashboardStats);
 router.get('/users', getAllUsers);
 router.get('/users/:id', getUserDetails);
 router.put('/users/:id/status', updateUserStatus);
+router.put('/users/:id/toggle-status', toggleUserStatus);
+router.post('/assign-package', assignPackage);
 
 // Payment management
 router.put('/payments/:id/toggle', togglePaymentStatus);

@@ -23,7 +23,12 @@ const paymentSchema = new mongoose.Schema({
   },
   proofImage: {
     type: String, // Path to uploaded image
-    required: [true, 'Please upload payment proof image']
+    required: function() {
+      // Only required if status is pending (user payment)
+      // Not required if approved by admin (admin assignment)
+      return this.status === 'pending';
+    },
+    default: null
   },
   transactionId: {
     type: String,

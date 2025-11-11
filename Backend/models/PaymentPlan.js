@@ -4,7 +4,6 @@ const paymentPlanSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Please provide plan name'],
-    enum: ['Free', 'Basic', 'Standard', 'Premium', 'VIP'],
     unique: true
   },
   price: {
@@ -15,19 +14,27 @@ const paymentPlanSchema = new mongoose.Schema({
   duration: {
     type: Number, // Duration in days
     required: true,
-    default: 30
+    default: 365
   },
   dailyAdsLimit: {
     type: Number,
     required: [true, 'Please provide daily ads limit'],
-    default: 10
+    default: 1000
+  },
+  dailyProfit: {
+    type: Number, // Daily profit in USD
+    default: 0
+  },
+  profitPercentage: {
+    type: Number, // Daily profit percentage (e.g., 3 for 3%)
+    default: 3
   },
   features: [{
     type: String
   }],
   adEarningRate: {
     type: Number,
-    default: 0.3 // Earning per ad click
+    default: 0.30 // Earning per ad click ($0.30 = 30 cents)
   },
   isPopular: {
     type: Boolean,

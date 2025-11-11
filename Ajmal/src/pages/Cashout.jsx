@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser, isAuthenticated } from '../services/auth';
+import { useAppContext } from '../context/AppContext';
 import './Cashout.css';
 
 const Cashout = () => {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(null);
+  const { user, isAuthenticated } = useAppContext();
   const [language, setLanguage] = useState('en'); // 'en' or 'ur'
   const [amount, setAmount] = useState('');
   const [withdrawalMethod, setWithdrawalMethod] = useState('');
@@ -14,12 +14,10 @@ const Cashout = () => {
 
   // Check authentication on mount
   useEffect(() => {
-    if (!isAuthenticated()) {
+    if (!isAuthenticated || !user) {
       navigate('/login', { replace: true });
-    } else {
-      setCurrentUser(getCurrentUser());
     }
-  }, [navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const content = {
     en: {

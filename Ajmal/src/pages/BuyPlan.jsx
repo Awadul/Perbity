@@ -1,22 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isAuthenticated, getCurrentUser } from '../services/auth';
+import { useAppContext } from '../context/AppContext';
 import './BuyPlan.css';
 
 const BuyPlan = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAppContext();
   const [language, setLanguage] = useState('en');
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
+    if (!isAuthenticated || !user) {
       navigate('/login');
       return;
     }
     setLoading(false);
-  }, [navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const content = {
     en: {

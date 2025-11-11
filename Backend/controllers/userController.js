@@ -6,12 +6,55 @@ import ErrorResponse from '../utils/errorResponse.js';
 // @access  Private
 export const getProfile = async (req, res, next) => {
   try {
+    // Get user with referral info
     const user = await User.findById(req.user.id)
       .populate('referredBy', 'name email');
 
+    // Import Payment model dynamically
+    const Payment = (await import('../models/Payment.js')).default;
+    
+    // Get active payment with plan details
+    const activePayment = await Payment.findOne({
+      user: req.user.id,
+      isActive: true,
+      status: 'approved'
+    }).populate('paymentPlan');
+
+    // Check if payment expired
+    if (activePayment) {
+      activePayment.checkExpiration();
+      await activePayment.save();
+    }
+
+    // Attach active payment to user response
+    const userResponse = user.toObject();
+    userResponse.activePayment = activePayment ? {
+      _id: activePayment._id,
+      plan: {
+        _id: activePayment.paymentPlan._id,
+        name: activePayment.paymentPlan.name,
+        price: activePayment.paymentPlan.price,
+        dailyAdsLimit: activePayment.paymentPlan.dailyAdsLimit,
+        dailyProfit: activePayment.paymentPlan.dailyProfit,
+        profitPercentage: activePayment.paymentPlan.profitPercentage,
+        duration: activePayment.paymentPlan.duration,
+        features: activePayment.paymentPlan.features
+      },
+      amount: activePayment.amount,
+      status: activePayment.status,
+      isActive: activePayment.isActive,
+      createdAt: activePayment.createdAt,
+      expiresAt: activePayment.expiresAt
+    } : null;
+
+    // Get today's ads viewed count
+    const AdClick = (await import('../models/AdClick.js')).default;
+    const adsViewedToday = await AdClick.getTodayClicksCount(req.user.id);
+    userResponse.adsViewedToday = adsViewedToday;
+
     res.status(200).json({
       success: true,
-      data: user
+      data: userResponse
     });
   } catch (error) {
     next(error);

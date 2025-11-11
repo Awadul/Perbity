@@ -15,15 +15,15 @@ const connectDB = async () => {
   }
 };
 
-// Ads data from frontend
-const adsData = [
+// Common ads available on the internet
+const commonAdsTemplate = [
   {
     title: 'Tech Gadgets',
     icon: 'fa-mobile-screen',
     color: 'from-blue-500 to-blue-400',
-    earning: 0.3,
-    displayOrder: 1,
-    description: 'Watch tech gadget advertisements and earn',
+    earning: 0.30,
+    description: 'Latest smartphones, tablets and gadgets. Shop now!',
+    url: 'https://www.amazon.com/electronics',
     isActive: true,
     isPremium: false
   },
@@ -31,9 +31,9 @@ const adsData = [
     title: 'Mobile Packages',
     icon: 'fa-sim-card',
     color: 'from-green-500 to-green-400',
-    earning: 0.3,
-    displayOrder: 2,
-    description: 'Explore mobile package deals',
+    earning: 0.30,
+    description: 'Best mobile plans and packages. Get connected today!',
+    url: 'https://www.t-mobile.com',
     isActive: true,
     isPremium: false
   },
@@ -41,9 +41,9 @@ const adsData = [
     title: 'Online Learning',
     icon: 'fa-graduation-cap',
     color: 'from-yellow-500 to-yellow-400',
-    earning: 0.3,
-    displayOrder: 3,
-    description: 'Discover online learning opportunities',
+    earning: 0.30,
+    description: 'Learn new skills with thousands of courses online',
+    url: 'https://www.coursera.org',
     isActive: true,
     isPremium: false
   },
@@ -51,9 +51,9 @@ const adsData = [
     title: 'Shopping Deals',
     icon: 'fa-bag-shopping',
     color: 'from-red-500 to-red-400',
-    earning: 0.3,
-    displayOrder: 4,
-    description: 'Find amazing shopping deals',
+    earning: 0.30,
+    description: 'Amazing deals on clothing, electronics and more!',
+    url: 'https://www.ebay.com',
     isActive: true,
     isPremium: false
   },
@@ -61,9 +61,9 @@ const adsData = [
     title: 'Freelance Work',
     icon: 'fa-laptop-code',
     color: 'from-purple-500 to-purple-400',
-    earning: 0.3,
-    displayOrder: 5,
-    description: 'Explore freelance work opportunities',
+    earning: 0.30,
+    description: 'Find freelance jobs and start earning today',
+    url: 'https://www.upwork.com',
     isActive: true,
     isPremium: false
   },
@@ -71,9 +71,9 @@ const adsData = [
     title: 'Health Products',
     icon: 'fa-heart-pulse',
     color: 'from-pink-500 to-pink-400',
-    earning: 0.3,
-    displayOrder: 6,
-    description: 'Discover health and wellness products',
+    earning: 0.30,
+    description: 'Quality health and wellness products for you',
+    url: 'https://www.iherb.com',
     isActive: true,
     isPremium: false
   },
@@ -81,9 +81,9 @@ const adsData = [
     title: 'Travel Offers',
     icon: 'fa-plane',
     color: 'from-indigo-500 to-indigo-400',
-    earning: 0.3,
-    displayOrder: 7,
-    description: 'Explore exciting travel offers',
+    earning: 0.30,
+    description: 'Book flights, hotels and travel packages',
+    url: 'https://www.booking.com',
     isActive: true,
     isPremium: false
   },
@@ -91,9 +91,9 @@ const adsData = [
     title: 'Food Delivery',
     icon: 'fa-utensils',
     color: 'from-orange-500 to-orange-400',
-    earning: 0.3,
-    displayOrder: 8,
-    description: 'Check out food delivery services',
+    earning: 0.30,
+    description: 'Order food from your favorite restaurants',
+    url: 'https://www.ubereats.com',
     isActive: true,
     isPremium: false
   },
@@ -101,9 +101,9 @@ const adsData = [
     title: 'Entertainment',
     icon: 'fa-film',
     color: 'from-teal-500 to-teal-400',
-    earning: 0.3,
-    displayOrder: 9,
-    description: 'Discover entertainment options',
+    earning: 0.30,
+    description: 'Stream movies, TV shows and music',
+    url: 'https://www.netflix.com',
     isActive: true,
     isPremium: false
   },
@@ -111,9 +111,9 @@ const adsData = [
     title: 'Home Services',
     icon: 'fa-house-chimney',
     color: 'from-cyan-500 to-cyan-400',
-    earning: 0.3,
-    displayOrder: 10,
-    description: 'Find home service providers',
+    earning: 0.30,
+    description: 'Professional services for your home needs',
+    url: 'https://www.taskrabbit.com',
     isActive: true,
     isPremium: false
   }
@@ -128,13 +128,32 @@ const seedAds = async () => {
     await Ad.deleteMany({});
     console.log('Cleared existing ads');
     
-    // Insert new ads
-    const ads = await Ad.insertMany(adsData);
-    console.log(`${ads.length} ads inserted successfully`);
+    // Create multiple copies of each ad (20 copies = 200 total ads)
+    const allAds = [];
+    const copies = 20; // Number of times to repeat each ad
     
-    // Display inserted ads
-    ads.forEach((ad, index) => {
-      console.log(`${index + 1}. ${ad.title} - $${ad.earning} - ${ad.color}`);
+    for (let i = 0; i < copies; i++) {
+      commonAdsTemplate.forEach((ad, index) => {
+        allAds.push({
+          ...ad,
+          displayOrder: (i * 10) + index + 1
+        });
+      });
+    }
+    
+    // Insert all ads
+    const ads = await Ad.insertMany(allAds);
+    console.log(`\n✅ ${ads.length} ads inserted successfully!`);
+    
+    // Display summary
+    console.log('\n📊 Ads Summary:');
+    console.log(`   - Unique ad types: ${commonAdsTemplate.length}`);
+    console.log(`   - Copies per type: ${copies}`);
+    console.log(`   - Total ads: ${ads.length}`);
+    console.log(`   - Earning per ad: $${commonAdsTemplate[0].earning}`);
+    console.log('\n📋 Ad Types:');
+    commonAdsTemplate.forEach((ad, index) => {
+      console.log(`   ${index + 1}. ${ad.title} (${copies} copies)`);
     });
     
     console.log('\n✅ Ads seeding completed successfully!');

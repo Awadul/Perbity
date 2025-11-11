@@ -29,15 +29,21 @@ export const AppProvider = ({ children }) => {
           setUser(localUser);
           setIsAuthenticated(true);
           
-          // Optionally refresh user data from server
-          try {
-            const freshUser = await fetchCurrentUser();
-            if (freshUser) {
-              setUser(freshUser);
+          // Only refresh user data from server if not on auth pages
+          const currentPath = window.location.pathname;
+          const isAuthPage = currentPath === '/login' || currentPath === '/signup';
+          
+          if (!isAuthPage) {
+            // Optionally refresh user data from server
+            try {
+              const freshUser = await fetchCurrentUser();
+              if (freshUser) {
+                setUser(freshUser);
+              }
+            } catch (error) {
+              // Silently fail - keep using local user data if refresh fails
+              // This prevents console errors on login page when backend is starting
             }
-          } catch (error) {
-            console.error('Failed to refresh user data:', error);
-            // Keep using local user data if refresh fails
           }
         } else {
           // Clear any stale auth state

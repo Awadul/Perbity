@@ -86,7 +86,7 @@ export const getTodayClicks = async (req, res, next) => {
   }
 };
 
-// @desc    Click an ad
+// @desc    Click an ad / View ad and earn
 // @route   POST /api/ads/:id/click
 // @access  Private
 export const clickAd = async (req, res, next) => {
@@ -131,36 +131,58 @@ export const clickAd = async (req, res, next) => {
     today.setHours(0, 0, 0, 0);
 
     const existingClick = await AdClick.findOne({
-      user: req.user.id,
+      user: req.user._id,
       ad: ad._id,
       clickDate: { $gte: today }
     });
 
     if (existingClick) {
-      return next(new ErrorResponse('You have already clicked this ad today', 400));
+      return next(new ErrorResponse('You have already viewed this ad today', 400));
     }
 
-    // Create ad click record
+    // Create ad click record with completion
     const adClick = await AdClick.create({
-      user: req.user.id,
+      user: req.user._id,
       ad: ad._id,
       earning: ad.earning,
       ipAddress: req.ip,
-      userAgent: req.headers['user-agent']
+      userAgent: req.headers['user-agent'],
+      isCompleted: true,
+      isVerified: true,
+      verifiedAt: Date.now(),
+      clickDuration: 10 // 10 second viewing
     });
 
-    // Update user's balance and ad earnings
-    const user = await User.findById(req.user.id);
-    user.balance += ad.earning;
-    user.adEarnings += ad.earning;
+    // Update user's earnings using the addEarnings method
+    const user = await User.findById(req.user._id);
+    
+    // Reset daily stats if needed
+    user.resetDailyStats();
+    
+    // Add earnings to user account
+    user.addEarnings(ad.earning, 'ads');
+    user.adsCompleted += 1;
+    user.adsCompletedToday += 1;
+    user.lastAdClickDate = Date.now();
+    
     await user.save();
+    
+    // Update ad statistics
+    ad.totalClicks += 1;
+    ad.totalEarningsPaid += ad.earning;
+    await ad.save();
 
     res.status(201).json({
       success: true,
-      message: 'Ad clicked successfully',
+      message: 'Ad viewed successfully! Earnings added to your balance.',
       data: {
         earning: ad.earning,
-        newBalance: user.balance
+        newBalance: user.balance,
+        totalEarnings: user.totalEarnings,
+        adsEarnings: user.earnings.ads,
+        todayEarnings: user.earningsToday,
+        adsViewedToday: user.adsCompletedToday,
+        remainingAds: Math.max(0, dailyAdsLimit - (todayClicksCount + 1))
       }
     });
   } catch (error) {
