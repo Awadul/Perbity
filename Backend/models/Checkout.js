@@ -15,12 +15,13 @@ const checkoutSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     required: [true, 'Please provide payment method'],
-    enum: ['binance', 'paypal', 'bank', 'crypto', 'wise', 'skrill']
+    enum: ['binance', 'paypal', 'bank', 'crypto', 'wise', 'skrill', 'easypaisa']
   },
   paymentDetails: {
     email: String,
     accountNumber: String,
     accountName: String,
+    accountHolderName: String,
     bankName: String,
     walletAddress: String,
     phoneNumber: String,

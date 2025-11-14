@@ -52,6 +52,7 @@ import referralRoutes from './routes/referralRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import checkoutRoutes from './routes/checkoutRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import historyRoutes from './routes/historyRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -59,6 +60,7 @@ app.use('/api/ads', adRoutes);
 app.use('/api/investments', investmentRoutes);
 app.use('/api/withdrawals', withdrawalRoutes);
 app.use('/api/referrals', referralRoutes);
+app.use('/api/history', historyRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/checkouts', checkoutRoutes);
 app.use('/api/admin', adminRoutes);

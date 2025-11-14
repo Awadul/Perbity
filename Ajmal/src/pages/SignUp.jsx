@@ -60,7 +60,7 @@ const SignUp = () => {
 
     if (!isRequired(formData.password)) {
       newErrors.password = 'Password is required';
-    } else if (!isValidPassword(formData.password)) {
+    } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
 

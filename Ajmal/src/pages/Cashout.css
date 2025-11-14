@@ -192,6 +192,38 @@
 }
 
 /* ========================================
+   WARNING CARD
+   ======================================== */
+
+.warning-card {
+  background: #fef3c7;
+  border: 1.5px solid #fbbf24;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: -8px;
+}
+
+.warning-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.warning-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #92400e;
+  margin: 0;
+  font-weight: 500;
+}
+
+.cashout-content.rtl .warning-text {
+  font-size: 14px;
+}
+
+/* ========================================
    CASHOUT FORM
    ======================================== */
 
@@ -274,6 +306,12 @@
 
 .submit-btn:active {
   transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* ========================================

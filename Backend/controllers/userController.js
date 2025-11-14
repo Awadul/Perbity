@@ -52,6 +52,61 @@ export const getProfile = async (req, res, next) => {
     const adsViewedToday = await AdClick.getTodayClicksCount(req.user.id);
     userResponse.adsViewedToday = adsViewedToday;
 
+    // Calculate total deposits from approved payments (sum of all approved package purchases)
+    const totalDepositsResult = await Payment.aggregate([
+      {
+        $match: {
+          user: req.user._id,
+          status: 'approved'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalDeposits: { $sum: '$amount' }
+        }
+      }
+    ]);
+    
+    userResponse.totalDeposits = totalDepositsResult.length > 0 ? totalDepositsResult[0].totalDeposits : 0;
+
+    // Calculate total withdraws from checkouts confirmed/completed by admin
+    const Checkout = (await import('../models/Checkout.js')).default;
+    const totalWithdrawsResult = await Checkout.aggregate([
+      {
+        $match: {
+          user: req.user._id,
+          status: 'completed'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalWithdrawn: { $sum: '$amount' }
+        }
+      }
+    ]);
+    
+    userResponse.totalWithdrawn = totalWithdrawsResult.length > 0 ? totalWithdrawsResult[0].totalWithdrawn : 0;
+
+    // Calculate pending withdraws from checkout requests pending admin confirmation
+    const pendingWithdrawsResult = await Checkout.aggregate([
+      {
+        $match: {
+          user: req.user._id,
+          status: { $in: ['pending', 'processing'] }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          pendingWithdraws: { $sum: '$amount' }
+        }
+      }
+    ]);
+    
+    userResponse.pendingWithdraws = pendingWithdrawsResult.length > 0 ? pendingWithdrawsResult[0].pendingWithdraws : 0;
+
     res.status(200).json({
       success: true,
       data: userResponse

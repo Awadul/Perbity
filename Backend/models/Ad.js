@@ -4,51 +4,15 @@ const adSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, 'Please provide ad title'],
-    trim: true,
-    enum: [
-      'Tech Gadgets',
-      'Mobile Packages',
-      'Online Learning',
-      'Shopping Deals',
-      'Freelance Work',
-      'Health Products',
-      'Travel Offers',
-      'Food Delivery',
-      'Entertainment',
-      'Home Services'
-    ]
+    trim: true
   },
   icon: {
     type: String,
-    required: true,
-    enum: [
-      'fa-mobile-screen',
-      'fa-sim-card',
-      'fa-graduation-cap',
-      'fa-bag-shopping',
-      'fa-laptop-code',
-      'fa-heart-pulse',
-      'fa-plane',
-      'fa-utensils',
-      'fa-film',
-      'fa-house-chimney'
-    ]
+    required: true
   },
   color: {
     type: String,
-    required: true,
-    enum: [
-      'from-blue-500 to-blue-400',
-      'from-green-500 to-green-400',
-      'from-yellow-500 to-yellow-400',
-      'from-red-500 to-red-400',
-      'from-purple-500 to-purple-400',
-      'from-pink-500 to-pink-400',
-      'from-indigo-500 to-indigo-400',
-      'from-orange-500 to-orange-400',
-      'from-teal-500 to-teal-400',
-      'from-cyan-500 to-cyan-400'
-    ]
+    required: true
   },
   earning: {
     type: Number,

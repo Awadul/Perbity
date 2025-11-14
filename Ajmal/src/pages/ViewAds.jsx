@@ -33,26 +33,26 @@ const ViewAds = () => {
       // Fetch ads from backend (this includes user plan info)
       const adsResponse = await apiService.get('/ads');
       
-      if (adsResponse.data.success) {
-        const { data, userPlan } = adsResponse.data;
+      if (adsResponse.success) {
+        const { data, userPlan } = adsResponse;
         
-        // Set all ads
-        setAds(data || []);
-        
-        // Filter out already clicked ads and limit to remaining count
+        // Filter out already clicked ads
         const clickedIds = userPlan.clickedAdIds || [];
         const unclickedAds = data.filter(ad => !clickedIds.includes(ad._id));
         
-        // Only show ads up to the remaining limit
-        const adsToShow = unclickedAds.slice(0, userPlan.remainingAds);
-        setAvailableAds(adsToShow);
+        // Only show remaining unclicked ads up to the remaining limit
+        const availableUnclickedAds = unclickedAds.slice(0, userPlan.remainingAds);
+        
+        // Set ads to display (only remaining/available ads)
+        setAds(availableUnclickedAds);
+        setAvailableAds(availableUnclickedAds);
         
         // Set user plan info
         setDailyLimit(userPlan.dailyLimit);
         setViewedToday(userPlan.clickedToday);
         setRemainingAds(userPlan.remainingAds);
         setPackageName(userPlan.name);
-        setEarnings(userPlan.clickedToday * 0.30);
+        setEarnings(userPlan.clickedToday * 1.00);
         setClickedAdIds(clickedIds);
       }
     } catch (error) {
@@ -71,6 +71,9 @@ const ViewAds = () => {
     }
 
     try {
+      // Open the ad URL in new tab immediately
+      window.open(ad.url, '_blank', 'noopener,noreferrer');
+      
       // Record ad click on backend
       const response = await apiService.post(`/ads/${ad._id}/click`);
       
@@ -83,16 +86,14 @@ const ViewAds = () => {
         setEarnings(earnings + earning);
         
         // Remove the clicked ad from available ads
+        setAds(prev => prev.filter(a => a._id !== ad._id));
         setAvailableAds(prev => prev.filter(a => a._id !== ad._id));
         
         // Add to clicked ads list
         setClickedAdIds(prev => [...prev, ad._id]);
         
-        // Open the ad URL in new tab
-        window.open(ad.url, '_blank', 'noopener,noreferrer');
-        
         // Show success message
-        alert(`+$${earning.toFixed(3)} earned! New balance: $${newBalance.toFixed(2)}`);
+        alert(`+$${earning.toFixed(2)} earned! New balance: $${newBalance.toFixed(2)}`);
         
         // If no more ads remaining, show completion message
         if (newRemaining === 0) {
@@ -154,89 +155,73 @@ const ViewAds = () => {
     );
   }
 
+  const progressPercentage = dailyLimit > 0 ? (viewedToday / dailyLimit) * 100 : 0;
+
   return (
     <div className="view-ads-container">
       <div className="ads-page">
-        <div className="ads-header">
-          <button className="close-btn" onClick={handleBack}>
-            <i className="fas fa-times"></i>
-          </button>
-          
-          <h1>Available Ads</h1>
-          
-          <div className="ads-stats-bar">
-            <div className="stat-item">
-              <span className="stat-label">Package:</span>
-              <span className="stat-value">{packageName}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Can Watch Today:</span>
-              <span className="stat-value">{remainingAds}/{dailyLimit}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Viewed Today:</span>
-              <span className="stat-value">{viewedToday}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Today's Earnings:</span>
-              <span className="stat-value highlight">${earnings.toFixed(3)}</span>
-            </div>
-          </div>
-        </div>
+        <button className="close-btn-top" onClick={handleBack}>
+          <i className="fas fa-arrow-left"></i> Back
+        </button>
 
-        {remainingAds === 0 && viewedToday > 0 ? (
-          <div className="limit-message">
-            <div className="limit-icon">🎯</div>
-            <h2>Daily Limit Reached!</h2>
-            <p>You've viewed all {dailyLimit} ads available for today.</p>
-            <p className="reset-info">Your ad viewing limit resets at midnight (00:00).</p>
-            <p>Come back tomorrow for more opportunities!</p>
-          </div>
-        ) : availableAds.length === 0 && remainingAds > 0 ? (
-          <div className="limit-message">
-            <div className="limit-icon">📢</div>
-            <h2>No More Ads Available</h2>
-            <p>You have {remainingAds} ad{remainingAds !== 1 ? 's' : ''} remaining but all ads have been viewed.</p>
-            <p className="reset-info">New ads or your limit will reset at midnight (00:00).</p>
-            <p>Check back later!</p>
-          </div>
-        ) : availableAds.length === 0 ? (
-          <div className="limit-message">
-            <div className="limit-icon">📢</div>
-            <h2>No Ads Available</h2>
-            <p>There are no ads in the system at the moment.</p>
-            <p>Please check back later!</p>
-          </div>
-        ) : (
-          <>
-            <div className="ads-instruction">
-              <i className="fas fa-info-circle"></i>
-              <span>Click on any ad card to visit the website and earn $0.30 per ad! Showing {availableAds.length} ad{availableAds.length !== 1 ? 's' : ''} available to you.</span>
+        <div className="card">
+          <div className="ads-header-new">
+            <div>
+              <h2 className="ads-title">Daily Advertisements</h2>
+              <p className="ads-subtitle">Click ads to earn $1.00 per click</p>
             </div>
-            
-            <div className="ads-grid">
-              {availableAds.map((ad) => (
+            <div className="progress-section">
+              <span className="progress-text">{viewedToday}/{dailyLimit} completed</span>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
+              </div>
+            </div>
+          </div>
+          
+          {remainingAds === 0 && viewedToday > 0 ? (
+            <div className="limit-message">
+              <div className="limit-icon">🎯</div>
+              <h2>Daily Limit Reached!</h2>
+              <p>You've viewed all {dailyLimit} ads available for today.</p>
+              <p className="reset-info">Your ad viewing limit resets at midnight (00:00).</p>
+            </div>
+          ) : availableAds.length === 0 && remainingAds > 0 ? (
+            <div className="limit-message">
+              <div className="limit-icon">📢</div>
+              <h2>No More Ads Available</h2>
+              <p>You have {remainingAds} ad{remainingAds !== 1 ? 's' : ''} remaining but all ads have been viewed.</p>
+              <p className="reset-info">Check back later!</p>
+            </div>
+          ) : availableAds.length === 0 ? (
+            <div className="limit-message">
+              <div className="limit-icon">📢</div>
+              <h2>No Ads Available</h2>
+              <p>There are no ads in the system at the moment.</p>
+            </div>
+          ) : (
+            <div className="ad-grid">
+              {ads.map((ad) => (
                 <div
                   key={ad._id}
-                  className={`ad-card-item gradient-${ad.color}`}
+                  className="ad-box"
                   onClick={() => handleAdClick(ad)}
+                  style={{ cursor: 'pointer' }}
                 >
-                  <div className="ad-icon">
+                  <div className={`ad-icon-wrapper gradient-${ad.color.replace('from-', '').replace(' to-', '-').split('-')[0]}`}>
                     <i className={`fas ${ad.icon}`}></i>
                   </div>
-                  <h3 className="ad-title">{ad.title}</h3>
-                  <p className="ad-description">{ad.description}</p>
-                  <div className="ad-footer">
-                    <span className="earn-badge">
-                      <i className="fas fa-dollar-sign"></i> Earn $0.30
-                    </span>
-                    <i className="fas fa-external-link-alt visit-icon"></i>
-                  </div>
+                  
+                  <h3 className="ad-box-title">{ad.title}</h3>
+                  <p className="ad-box-earning">Earn $1.00</p>
+                  
+                  <button className="ad-click-btn">
+                    Click Ad
+                  </button>
                 </div>
               ))}
             </div>
-          </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

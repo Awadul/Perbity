@@ -15,11 +15,10 @@ export const isValidEmail = (email) => {
 /**
  * Validate password strength
  * @param {string} password - Password to validate
- * @returns {boolean} True if valid (min 8 chars, 1 uppercase, 1 number)
+ * @returns {boolean} True if valid (min 6 chars)
  */
 export const isValidPassword = (password) => {
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-  return passwordRegex.test(password);
+  return password && password.length >= 6;
 };
 
 /**

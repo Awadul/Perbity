@@ -1,5 +1,6 @@
 import Checkout from '../models/Checkout.js';
 import User from '../models/User.js';
+import History from '../models/History.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import fs from 'fs';
 
@@ -16,8 +17,8 @@ export const createCheckout = async (req, res, next) => {
     }
     
     // Check minimum balance
-    if (req.user.pendingBalance < amount) {
-      return next(new ErrorResponse(`Insufficient balance. Available: $${req.user.pendingBalance}`, 400));
+    if (req.user.balance < amount) {
+      return next(new ErrorResponse(`Insufficient balance. Available: $${req.user.balance}`, 400));
     }
     
     // Check if user has pending checkout
@@ -26,6 +27,10 @@ export const createCheckout = async (req, res, next) => {
       return next(new ErrorResponse('You already have a pending checkout request', 400));
     }
     
+    // Deduct amount from user balance immediately
+    req.user.balance -= amount;
+    await req.user.save();
+
     // Create checkout
     const checkout = await Checkout.create({
       user: req.user._id,
@@ -34,6 +39,23 @@ export const createCheckout = async (req, res, next) => {
       paymentDetails,
       requestNote
     });
+
+    // Add to history
+    await History.addRecord(
+      req.user._id,
+      'withdrawal',
+      -amount,
+      `Withdrawal request of $${amount.toFixed(2)} via ${paymentMethod}`,
+      {
+        status: 'pending',
+        reference: checkout._id,
+        referenceModel: 'Checkout',
+        metadata: {
+          paymentMethod,
+          checkoutId: checkout._id
+        }
+      }
+    );
     
     res.status(201).json({
       success: true,
@@ -84,7 +106,7 @@ export const getAllCheckouts = async (req, res, next) => {
     }
     
     const checkouts = await Checkout.find(query)
-      .populate('user', 'name email phone pendingBalance')
+      .populate('user', 'name email phone balance')
       .populate('processedBy', 'name email')
       .sort({ requestedAt: -1 })
       .limit(limit * 1)
@@ -164,15 +186,9 @@ export const completeCheckout = async (req, res, next) => {
       proofImage = req.file.path;
     }
     
-    // Update user balance
+    // Update user totalWithdrawn (balance already deducted when request was created)
     const user = await User.findById(checkout.user._id);
-    if (user.pendingBalance < checkout.amount) {
-      if (req.file) fs.unlinkSync(req.file.path);
-      return next(new ErrorResponse('User has insufficient balance', 400));
-    }
-    
-    user.pendingBalance -= checkout.amount;
-    user.totalWithdrawn += checkout.amount;
+    user.totalWithdrawn = (user.totalWithdrawn || 0) + checkout.amount;
     await user.save();
     
     // Complete checkout
@@ -182,7 +198,24 @@ export const completeCheckout = async (req, res, next) => {
       await checkout.save();
     }
     
-    await checkout.populate('user', 'name email phone pendingBalance');
+    // Update history record status to completed
+    await History.findOneAndUpdate(
+      { 
+        reference: checkout._id,
+        referenceModel: 'Checkout',
+        type: 'withdrawal'
+      },
+      { 
+        status: 'completed',
+        $set: {
+          'metadata.completedAt': new Date(),
+          'metadata.transactionId': transactionId,
+          'metadata.processedBy': req.user._id
+        }
+      }
+    );
+    
+    await checkout.populate('user', 'name email phone balance');
     
     res.status(200).json({
       success: true,
@@ -216,8 +249,31 @@ export const rejectCheckout = async (req, res, next) => {
       return next(new ErrorResponse('Cannot reject completed checkout', 400));
     }
     
+    // Refund the amount back to user balance
+    const user = await User.findById(checkout.user._id);
+    user.balance += checkout.amount;
+    await user.save();
+    
     await checkout.reject(req.user._id, reason);
     await checkout.populate('user', 'name email phone');
+    
+    // Update history record status to rejected
+    await History.findOneAndUpdate(
+      { 
+        reference: checkout._id,
+        referenceModel: 'Checkout',
+        type: 'withdrawal'
+      },
+      { 
+        status: 'rejected',
+        description: `Withdrawal rejected: ${reason}`,
+        $set: {
+          'metadata.rejectedAt': new Date(),
+          'metadata.rejectionReason': reason,
+          'metadata.processedBy': req.user._id
+        }
+      }
+    );
     
     res.status(200).json({
       success: true,
@@ -249,8 +305,29 @@ export const cancelCheckout = async (req, res, next) => {
       return next(new ErrorResponse(`Cannot cancel checkout with status: ${checkout.status}`, 400));
     }
     
+    // Refund the amount back to user balance
+    const user = await User.findById(checkout.user._id);
+    user.balance += checkout.amount;
+    await user.save();
+    
     checkout.status = 'cancelled';
     await checkout.save();
+    
+    // Update history record status to cancelled
+    await History.findOneAndUpdate(
+      { 
+        reference: checkout._id,
+        referenceModel: 'Checkout',
+        type: 'withdrawal'
+      },
+      { 
+        status: 'cancelled',
+        description: `Withdrawal cancelled by user`,
+        $set: {
+          'metadata.cancelledAt': new Date()
+        }
+      }
+    );
     
     res.status(200).json({
       success: true,

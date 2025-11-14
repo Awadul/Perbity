@@ -101,7 +101,7 @@ export const getAllUsers = async (req, res, next) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
     
-    // Get active payment for each user
+    // Get active payment for each user and calculate total deposits
     const usersWithPlans = await Promise.all(
       users.map(async (user) => {
         const activePayment = await Payment.findOne({
@@ -109,6 +109,38 @@ export const getAllUsers = async (req, res, next) => {
           isActive: true,
           status: 'approved'
         }).populate('paymentPlan');
+        
+        // Calculate total deposits from approved payments
+        const totalDepositsResult = await Payment.aggregate([
+          {
+            $match: {
+              user: user._id,
+              status: 'approved'
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              totalDeposits: { $sum: '$amount' }
+            }
+          }
+        ]);
+        
+        // Calculate total withdraws from checkouts confirmed/completed by admin
+        const totalWithdrawsResult = await Checkout.aggregate([
+          {
+            $match: {
+              user: user._id,
+              status: 'completed'
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              totalWithdrawn: { $sum: '$amount' }
+            }
+          }
+        ]);
         
         // Format the response to match frontend expectations
         const userObj = user.toObject();
@@ -120,6 +152,27 @@ export const getAllUsers = async (req, res, next) => {
         } else {
           userObj.activePayment = null;
         }
+        
+        // Calculate pending withdraws from checkout requests pending admin confirmation
+        const pendingWithdrawsResult = await Checkout.aggregate([
+          {
+            $match: {
+              user: user._id,
+              status: { $in: ['pending', 'processing'] }
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              pendingWithdraws: { $sum: '$amount' }
+            }
+          }
+        ]);
+        
+        // Add total deposits, withdraws, and pending withdraws calculated from database records
+        userObj.totalDeposits = totalDepositsResult.length > 0 ? totalDepositsResult[0].totalDeposits : 0;
+        userObj.totalWithdrawn = totalWithdrawsResult.length > 0 ? totalWithdrawsResult[0].totalWithdrawn : 0;
+        userObj.pendingWithdraws = pendingWithdrawsResult.length > 0 ? pendingWithdrawsResult[0].pendingWithdraws : 0;
         
         return userObj;
       })

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import apiService from '../services/api';
 import './Cashout.css';
 
 const Cashout = () => {
@@ -8,16 +9,34 @@ const Cashout = () => {
   const { user, isAuthenticated } = useAppContext();
   const [language, setLanguage] = useState('en'); // 'en' or 'ur'
   const [amount, setAmount] = useState('');
-  const [withdrawalMethod, setWithdrawalMethod] = useState('');
-  const [accountDetails, setAccountDetails] = useState('');
+  const [easypaisaPhone, setEasypaisaPhone] = useState('');
+  const [easypaisaName, setEasypaisaName] = useState('');
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [userBalance, setUserBalance] = useState(0);
 
-  // Check authentication on mount
+  // Check authentication and fetch balance
   useEffect(() => {
     if (!isAuthenticated || !user) {
       navigate('/login', { replace: true });
+      return;
     }
+    fetchUserBalance();
   }, [isAuthenticated, user, navigate]);
+
+  const fetchUserBalance = async () => {
+    try {
+      const response = await apiService.get('/users/profile');
+      if (response.success && response.data) {
+        // Use data.balance if it exists, otherwise fallback to user context
+        setUserBalance(response.data.balance || user?.balance || 0);
+      }
+    } catch (error) {
+      console.error('Failed to fetch balance:', error);
+      // Fallback to context balance if API fails
+      setUserBalance(user?.balance || 0);
+    }
+  };
 
   const content = {
     en: {
@@ -25,16 +44,16 @@ const Cashout = () => {
       subtitle: 'Withdraw your earnings',
       availableBalance: 'Available Balance',
       infoTitle: 'Withdrawal Information',
-      infoText: 'You can withdraw from $20 up to $10,000 24/7.',
-      minAmount: 'Minimum: $20',
+      infoText: 'You can withdraw from $50 up to $10,000. Minimum balance required: $50',
+      minAmount: 'Minimum: $50',
       maxAmount: 'Maximum: $10,000',
       available247: 'Available 24/7',
       amountLabel: 'Withdrawal Amount',
-      amountPlaceholder: 'Enter amount ($20 - $10,000)',
-      methodLabel: 'Withdrawal Method',
-      methodPlaceholder: 'Select withdrawal method',
-      accountLabel: 'Account Details',
-      accountPlaceholder: 'Enter your account details',
+      amountPlaceholder: 'Enter amount ($50 - $10,000)',
+      phoneLabel: 'EasyPaisa Phone Number',
+      phonePlaceholder: 'Enter your EasyPaisa phone (03XXXXXXXXX)',
+      nameLabel: 'Account Holder Name',
+      namePlaceholder: 'Enter name as per EasyPaisa account',
       submitButton: 'Submit Withdrawal',
       methods: {
         bank: 'Bank Transfer',
@@ -50,16 +69,16 @@ const Cashout = () => {
       subtitle: 'اپنی کمائی نکالیں',
       availableBalance: 'دستیاب بیلنس',
       infoTitle: 'نکلوانے کی معلومات',
-      infoText: 'آپ $20 سے لے کر $10,000 تک کسی بھی وقت، دن رات (24/7) نکال سکتے ہیں۔',
-      minAmount: 'کم از کم: $20',
+      infoText: 'آپ $50 سے لے کر $10,000 تک نکال سکتے ہیں۔ کم از کم بیلنس: $50',
+      minAmount: 'کم از کم: $50',
       maxAmount: 'زیادہ سے زیادہ: $10,000',
       available247: '24/7 دستیاب',
       amountLabel: 'نکلوانے کی رقم',
-      amountPlaceholder: 'رقم درج کریں ($20 - $10,000)',
-      methodLabel: 'نکلوانے کا طریقہ',
-      methodPlaceholder: 'نکلوانے کا طریقہ منتخب کریں',
-      accountLabel: 'اکاؤنٹ کی تفصیلات',
-      accountPlaceholder: 'اپنے اکاؤنٹ کی تفصیلات درج کریں',
+      amountPlaceholder: 'رقم درج کریں ($50 - $10,000)',
+      phoneLabel: 'ایزی پیسہ فون نمبر',
+      phonePlaceholder: 'اپنا ایزی پیسہ فون نمبر درج کریں (03XXXXXXXXX)',
+      nameLabel: 'اکاؤنٹ ہولڈر کا نام',
+      namePlaceholder: 'ایزی پیسہ اکاؤنٹ کے مطابق نام درج کریں',
       submitButton: 'نکلوانے کی درخواست جمع کرائیں',
       methods: {
         bank: 'بینک ٹرانسفر',
@@ -76,39 +95,73 @@ const Cashout = () => {
     setLanguage(language === 'en' ? 'ur' : 'en');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     const newErrors = {};
     const numAmount = parseFloat(amount);
 
+    // Validate amount
     if (!amount) {
       newErrors.amount = language === 'en' ? 'Amount is required' : 'رقم درج کرنا ضروری ہے';
-    } else if (numAmount < 20) {
-      newErrors.amount = language === 'en' ? 'Minimum withdrawal is $20' : 'کم از کم نکلوانا $20 ہے';
+    } else if (numAmount < 50) {
+      newErrors.amount = language === 'en' ? 'Minimum withdrawal is $50' : 'کم از کم نکلوانا $50 ہے';
     } else if (numAmount > 10000) {
       newErrors.amount = language === 'en' ? 'Maximum withdrawal is $10,000' : 'زیادہ سے زیادہ نکلوانا $10,000 ہے';
+    } else if (numAmount > userBalance) {
+      newErrors.amount = language === 'en' ? `Insufficient balance. Available: $${userBalance.toFixed(2)}` : `ناکافی بیلنس۔ دستیاب: $${userBalance.toFixed(2)}`;
     }
 
-    if (!withdrawalMethod) {
-      newErrors.method = language === 'en' ? 'Please select a withdrawal method' : 'براہ کرم نکلوانے کا طریقہ منتخب کریں';
+    // Validate phone
+    if (!easypaisaPhone) {
+      newErrors.phone = language === 'en' ? 'Phone number is required' : 'فون نمبر درج کرنا ضروری ہے';
+    } else if (!/^03\d{9}$/.test(easypaisaPhone)) {
+      newErrors.phone = language === 'en' ? 'Invalid phone format (03XXXXXXXXX)' : 'غلط فون فارمیٹ (03XXXXXXXXX)';
     }
 
-    if (!accountDetails) {
-      newErrors.account = language === 'en' ? 'Account details are required' : 'اکاؤنٹ کی تفصیلات درج کرنا ضروری ہے';
+    // Validate name
+    if (!easypaisaName) {
+      newErrors.name = language === 'en' ? 'Name is required' : 'نام درج کرنا ضروری ہے';
+    } else if (easypaisaName.length < 3) {
+      newErrors.name = language === 'en' ? 'Name must be at least 3 characters' : 'نام کم از کم 3 حروف کا ہونا چاہیے';
     }
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      alert(language === 'en' 
-        ? 'Withdrawal request submitted successfully!' 
-        : 'نکلوانے کی درخواست کامیابی سے جمع ہو گئی!');
-      
-      // Reset form
-      setAmount('');
-      setWithdrawalMethod('');
-      setAccountDetails('');
+      try {
+        setLoading(true);
+        
+        const response = await apiService.post('/checkouts', {
+          amount: numAmount,
+          paymentMethod: 'easypaisa',
+          paymentDetails: {
+            phoneNumber: easypaisaPhone,
+            accountHolderName: easypaisaName,
+            accountName: easypaisaName
+          },
+          requestNote: `EasyPaisa withdrawal - ${easypaisaPhone}`
+        });
+
+        if (response.success) {
+          alert(language === 'en' 
+            ? 'Withdrawal request submitted successfully! Please wait for admin approval.' 
+            : 'نکلوانے کی درخواست کامیابی سے جمع ہو گئی! براہ کرم ایڈمن کی منظوری کا انتظار کریں۔');
+          
+          // Reset form
+          setAmount('');
+          setEasypaisaPhone('');
+          setEasypaisaName('');
+          fetchUserBalance(); // Refresh balance
+        }
+      } catch (error) {
+        console.error('Withdrawal request failed:', error);
+        alert(language === 'en'
+          ? error.message || 'Failed to submit withdrawal request'
+          : error.message || 'نکلوانے کی درخواست جمع کرانے میں ناکامی');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -135,8 +188,20 @@ const Cashout = () => {
           {/* Available Balance */}
           <div className="balance-display">
             <span className="balance-label">{content[language].availableBalance}</span>
-            <span className="balance-amount">PKR 0.00</span>
+            <span className="balance-amount">${userBalance.toFixed(2)}</span>
           </div>
+
+          {/* Minimum balance warning */}
+          {userBalance < 50 && (
+            <div className="warning-card">
+              <div className="warning-icon">⚠️</div>
+              <p className="warning-text">
+                {language === 'en'
+                  ? `You need at least $50 to withdraw. Current balance: $${userBalance.toFixed(2)}`
+                  : `نکلوانے کے لیے کم از کم $50 کی ضرورت ہے۔ موجودہ بیلنس: $${userBalance.toFixed(2)}`}
+              </p>
+            </div>
+          )}
 
           {/* Info Card */}
           <div className="info-card">
@@ -169,42 +234,45 @@ const Cashout = () => {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder={content[language].amountPlaceholder}
-                min="20"
+                min="50"
                 max="10000"
                 step="1"
+                disabled={userBalance < 50}
               />
               {errors.amount && <span className="error-text">{errors.amount}</span>}
             </div>
 
             <div className="form-group">
-              <label>{content[language].methodLabel}</label>
-              <select
-                value={withdrawalMethod}
-                onChange={(e) => setWithdrawalMethod(e.target.value)}
-              >
-                <option value="">{content[language].methodPlaceholder}</option>
-                <option value="bank">{content[language].methods.bank}</option>
-                <option value="easypaisa">{content[language].methods.easypaisa}</option>
-                <option value="jazzcash">{content[language].methods.jazzcash}</option>
-                <option value="paypal">{content[language].methods.paypal}</option>
-                <option value="crypto">{content[language].methods.crypto}</option>
-              </select>
-              {errors.method && <span className="error-text">{errors.method}</span>}
+              <label>{content[language].phoneLabel}</label>
+              <input
+                type="tel"
+                value={easypaisaPhone}
+                onChange={(e) => setEasypaisaPhone(e.target.value)}
+                placeholder={content[language].phonePlaceholder}
+                maxLength="11"
+                disabled={userBalance < 50}
+              />
+              {errors.phone && <span className="error-text">{errors.phone}</span>}
             </div>
 
             <div className="form-group">
-              <label>{content[language].accountLabel}</label>
-              <textarea
-                value={accountDetails}
-                onChange={(e) => setAccountDetails(e.target.value)}
-                placeholder={content[language].accountPlaceholder}
-                rows="4"
+              <label>{content[language].nameLabel}</label>
+              <input
+                type="text"
+                value={easypaisaName}
+                onChange={(e) => setEasypaisaName(e.target.value)}
+                placeholder={content[language].namePlaceholder}
+                disabled={userBalance < 50}
               />
-              {errors.account && <span className="error-text">{errors.account}</span>}
+              {errors.name && <span className="error-text">{errors.name}</span>}
             </div>
 
-            <button type="submit" className="submit-btn">
-              {content[language].submitButton}
+            <button 
+              type="submit" 
+              className="submit-btn"
+              disabled={userBalance < 50 || loading}
+            >
+              {loading ? (language === 'en' ? 'Submitting...' : 'جمع ہو رہا ہے...') : content[language].submitButton}
             </button>
           </form>
 

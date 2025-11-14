@@ -3,6 +3,7 @@ import AdClick from '../models/AdClick.js';
 import User from '../models/User.js';
 import Payment from '../models/Payment.js';
 import PaymentPlan from '../models/PaymentPlan.js';
+import History from '../models/History.js';
 import ErrorResponse from '../utils/errorResponse.js';
 
 // @desc    Get all ads
@@ -17,6 +18,11 @@ export const getAds = async (req, res, next) => {
       status: 'approved'
     }).populate('paymentPlan');
     
+    console.log('Active Payment:', activePayment ? 'Found' : 'Not found');
+    if (activePayment) {
+      console.log('Payment Plan:', activePayment.paymentPlan);
+    }
+    
     // Check if payment expired
     if (activePayment) {
       activePayment.checkExpiration();
@@ -27,9 +33,12 @@ export const getAds = async (req, res, next) => {
     let dailyAdsLimit = 10; // Default free plan limit
     let planName = 'Free';
     
-    if (activePayment && activePayment.isActive) {
-      dailyAdsLimit = activePayment.paymentPlan.dailyAdsLimit;
-      planName = activePayment.paymentPlan.name;
+    if (activePayment && activePayment.isActive && activePayment.paymentPlan) {
+      dailyAdsLimit = activePayment.paymentPlan.dailyAdsLimit || 10;
+      planName = activePayment.paymentPlan.name || 'Unknown Plan';
+      console.log(`User has active plan: ${planName}, Daily Limit: ${dailyAdsLimit}`);
+    } else {
+      console.log('User has no active plan, using free plan limit: 10');
     }
     
     // Get today's clicks count
@@ -171,6 +180,23 @@ export const clickAd = async (req, res, next) => {
     ad.totalClicks += 1;
     ad.totalEarningsPaid += ad.earning;
     await ad.save();
+
+    // Add to history
+    await History.addRecord(
+      req.user._id,
+      'ad_earning',
+      ad.earning,
+      `Earned $${ad.earning.toFixed(2)} from viewing "${ad.title}" ad`,
+      {
+        reference: ad._id,
+        referenceModel: 'Ad',
+        metadata: {
+          adTitle: ad.title,
+          adUrl: ad.url,
+          clickId: adClick._id
+        }
+      }
+    );
 
     res.status(201).json({
       success: true,

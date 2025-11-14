@@ -34,7 +34,7 @@ const paymentPlanSchema = new mongoose.Schema({
   }],
   adEarningRate: {
     type: Number,
-    default: 0.30 // Earning per ad click ($0.30 = 30 cents)
+    default: 1.00 // Earning per ad click ($1.00)
   },
   isPopular: {
     type: Boolean,

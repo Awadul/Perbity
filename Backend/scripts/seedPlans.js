@@ -15,24 +15,24 @@ const connectDB = async () => {
   }
 };
 
-// Investment packages: 3% daily profit, $0.30 per ad
-// Formula: dailyAdsLimit = (price * 0.03) / 0.30 = price * 0.1
+// Investment packages: 3 ads per $100, each ad = $1
+// Formula: dailyAdsLimit = (price / 100) * 3
 const plansData = [
   {
     name: '$100 Package',
     price: 100,
     duration: 365, // 1 year
-    dailyAdsLimit: 10, // $3 profit / $0.30 per ad = 10 ads
+    dailyAdsLimit: 3, // (100 / 100) * 3 = 3 ads
     dailyProfit: 3,
     profitPercentage: 3,
     features: [
-      '10 ads per day',
+      '3 ads per day',
       '$3 daily profit',
-      '3% daily return',
+      '$1 per ad',
       'Basic support',
       'Email notifications'
     ],
-    adEarningRate: 0.30,
+    adEarningRate: 1.00,
     isPopular: false,
     isActive: true,
     description: 'Entry level investment'
@@ -41,18 +41,18 @@ const plansData = [
     name: '$200 Package',
     price: 200,
     duration: 365,
-    dailyAdsLimit: 20, // $6 profit / $0.30 per ad = 20 ads
+    dailyAdsLimit: 6, // (200 / 100) * 3 = 6 ads
     dailyProfit: 6,
     profitPercentage: 3,
     features: [
-      '20 ads per day',
+      '6 ads per day',
       '$6 daily profit',
-      '3% daily return',
+      '$1 per ad',
       'Priority support',
       'Email notifications',
       'Advanced statistics'
     ],
-    adEarningRate: 0.30,
+    adEarningRate: 1.00,
     isPopular: false,
     isActive: true,
     description: 'Double your earnings'
@@ -61,18 +61,18 @@ const plansData = [
     name: '$300 Package',
     price: 300,
     duration: 365,
-    dailyAdsLimit: 30, // $9 profit / $0.30 per ad = 30 ads
+    dailyAdsLimit: 9, // (300 / 100) * 3 = 9 ads
     dailyProfit: 9,
     profitPercentage: 3,
     features: [
-      '30 ads per day',
+      '9 ads per day',
       '$9 daily profit',
-      '3% daily return',
+      '$1 per ad',
       'Priority support',
       'Advanced analytics',
       'Referral bonuses'
     ],
-    adEarningRate: 0.30,
+    adEarningRate: 1.00,
     isPopular: false,
     isActive: true,
     description: 'Great value package'
@@ -81,18 +81,18 @@ const plansData = [
     name: '$400 Package',
     price: 400,
     duration: 365,
-    dailyAdsLimit: 40, // $12 profit / $0.30 per ad = 40 ads
+    dailyAdsLimit: 12, // (400 / 100) * 3 = 12 ads
     dailyProfit: 12,
     profitPercentage: 3,
     features: [
-      '40 ads per day',
+      '12 ads per day',
       '$12 daily profit',
-      '3% daily return',
+      '$1 per ad',
       'VIP support',
       'Advanced analytics',
       'Higher referral bonuses'
     ],
-    adEarningRate: 0.30,
+    adEarningRate: 1.00,
     isPopular: true,
     isActive: true,
     description: 'Popular choice'
@@ -101,19 +101,19 @@ const plansData = [
     name: '$500 Package',
     price: 500,
     duration: 365,
-    dailyAdsLimit: 50, // $15 profit / $0.30 per ad = 50 ads
+    dailyAdsLimit: 15, // (500 / 100) * 3 = 15 ads
     dailyProfit: 15,
     profitPercentage: 3,
     features: [
-      '50 ads per day',
+      '15 ads per day',
       '$15 daily profit',
-      '3% daily return',
+      '$1 per ad',
       'VIP support',
       'Full analytics suite',
       'Maximum referral bonuses',
       'Instant withdrawals'
     ],
-    adEarningRate: 0.30,
+    adEarningRate: 1.00,
     isPopular: false,
     isActive: true,
     description: 'Mid-tier investment'
@@ -122,19 +122,19 @@ const plansData = [
     name: '$600 Package',
     price: 600,
     duration: 365,
-    dailyAdsLimit: 60, // $18 profit / $0.30 per ad = 60 ads
+    dailyAdsLimit: 18, // (600 / 100) * 3 = 18 ads
     dailyProfit: 18,
     profitPercentage: 3,
     features: [
-      '60 ads per day',
+      '18 ads per day',
       '$18 daily profit',
-      '3% daily return',
+      '$1 per ad',
       'Dedicated support',
       'Full analytics suite',
       'Maximum earnings potential',
       'Instant withdrawals'
     ],
-    adEarningRate: 0.30,
+    adEarningRate: 1.00,
     isPopular: false,
     isActive: true,
     description: 'High returns package'
@@ -143,19 +143,19 @@ const plansData = [
     name: '$700 Package',
     price: 700,
     duration: 365,
-    dailyAdsLimit: 70, // $21 profit / $0.30 per ad = 70 ads
+    dailyAdsLimit: 21, // (700 / 100) * 3 = 21 ads
     dailyProfit: 21,
     profitPercentage: 3,
     features: [
-      '70 ads per day',
+      '21 ads per day',
       '$21 daily profit',
-      '3% daily return',
+      '$1 per ad',
       'Dedicated support',
       'All exclusive ads',
       'Premium features',
       'Instant withdrawals'
     ],
-    adEarningRate: 0.30,
+    adEarningRate: 1.00,
     isPopular: false,
     isActive: true,
     description: 'Premium investment'
@@ -164,19 +164,19 @@ const plansData = [
     name: '$800 Package',
     price: 800,
     duration: 365,
-    dailyAdsLimit: 80, // $24 profit / $0.30 per ad = 80 ads
+    dailyAdsLimit: 24, // (800 / 100) * 3 = 24 ads
     dailyProfit: 24,
     profitPercentage: 3,
     features: [
-      '80 ads per day',
+      '24 ads per day',
       '$24 daily profit',
-      '3% daily return',
+      '$1 per ad',
       'Dedicated account manager',
       'All premium features',
       'Early access to new features',
       'Instant withdrawals'
     ],
-    adEarningRate: 0.30,
+    adEarningRate: 1.00,
     isPopular: false,
     isActive: true,
     description: 'Elite investment tier'
@@ -185,19 +185,19 @@ const plansData = [
     name: '$900 Package',
     price: 900,
     duration: 365,
-    dailyAdsLimit: 90, // $27 profit / $0.30 per ad = 90 ads
+    dailyAdsLimit: 27, // (900 / 100) * 3 = 27 ads
     dailyProfit: 27,
     profitPercentage: 3,
     features: [
-      '90 ads per day',
+      '27 ads per day',
       '$27 daily profit',
-      '3% daily return',
+      '$1 per ad',
       'Dedicated account manager',
       'VIP treatment',
       'All premium features',
       'Priority withdrawals'
     ],
-    adEarningRate: 0.30,
+    adEarningRate: 1.00,
     isPopular: false,
     isActive: true,
     description: 'Near maximum returns'
@@ -206,13 +206,13 @@ const plansData = [
     name: '$1000 Package',
     price: 1000,
     duration: 365,
-    dailyAdsLimit: 100, // $30 profit / $0.30 per ad = 100 ads
+    dailyAdsLimit: 30, // (1000 / 100) * 3 = 30 ads
     dailyProfit: 30,
     profitPercentage: 3,
     features: [
-      '100 ads per day',
+      '30 ads per day',
       '$30 daily profit',
-      '3% daily return',
+      '$1 per ad',
       'Dedicated account manager',
       'VIP treatment',
       'Maximum earnings potential',
@@ -220,7 +220,7 @@ const plansData = [
       'Priority withdrawals',
       'Exclusive benefits'
     ],
-    adEarningRate: 0.30,
+    adEarningRate: 1.00,
     isPopular: false,
     isActive: true,
     description: 'Maximum investment package'

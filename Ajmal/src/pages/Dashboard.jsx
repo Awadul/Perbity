@@ -31,7 +31,7 @@ const Dashboard = () => {
     dailyLimit: 0,
     viewedToday: 0,
     remaining: 0,
-    earningsPerAd: 0.30, // $0.30 or 30 cents
+    earningsPerAd: 1.00, // $1.00 per ad
     todayEarnings: 0
   });
 
@@ -76,9 +76,9 @@ const Dashboard = () => {
         balance: userProfile.balance || 0,
         totalDeposits: userProfile.totalDeposits || 0,
         totalWithdraws: userProfile.totalWithdrawn || 0,
-        referralBonus: userProfile.earnings?.referrals || 0,
-        totalProfit: userProfile.totalEarnings || 0,
-        pendingWithdraws: userProfile.pendingBalance || 0,
+        referralBonus: 0,
+        totalProfit: userProfile.totalWithdrawn || 0,
+        pendingWithdraws: userProfile.pendingWithdraws || 0,
         teamMembers: userProfile.team?.totalMembers || 0,
         teamDeposit: userProfile.team?.teamEarnings || 0
       });
@@ -109,8 +109,8 @@ const Dashboard = () => {
           dailyLimit,
           viewedToday,
           remaining,
-          earningsPerAd: 0.30,
-          todayEarnings: viewedToday * 0.30
+          earningsPerAd: 1.00,
+          todayEarnings: viewedToday * 1.00
         });
       } else {
         // No active package - show message to buy plan
@@ -122,7 +122,7 @@ const Dashboard = () => {
           dailyLimit: 0,
           viewedToday: 0,
           remaining: 0,
-          earningsPerAd: 0.30,
+          earningsPerAd: 1.00,
           todayEarnings: 0
         });
       }
@@ -204,11 +204,11 @@ const Dashboard = () => {
               </div>
               <div className="detail-row">
                 <span>Earning per Ad:</span>
-                <strong>$0.30</strong>
+                <strong>$1.00</strong>
               </div>
               <div className="detail-row">
                 <span>Max Daily Earnings:</span>
-                <strong className="success-text">${(activePackage.dailyAdLimit * 0.30).toFixed(2)}</strong>
+                <strong className="success-text">${(activePackage.dailyAdLimit * 1.00).toFixed(2)}</strong>
               </div>
               <div className="detail-row">
                 <span>Today's Earnings:</span>
@@ -340,7 +340,7 @@ const Dashboard = () => {
           {/* View Ads CTA */}
           <div className="ads-cta-card">
             <h3>Watch Ads & Earn</h3>
-            <p>Earn $0.30 per ad viewed</p>
+            <p>Earn $1.00 per ad viewed</p>
             <button 
               className={`ads-btn ${adsData.remaining === 0 ? 'disabled' : ''}`}
               onClick={handleViewAds}
@@ -383,57 +383,18 @@ const Dashboard = () => {
               <div className="menu-icon">📊</div>
               <span>History</span>
             </button>
-            <button className="menu-item" onClick={() => navigate('/earnings')}>
-              <div className="menu-icon">💵</div>
-              <span>Earnings</span>
-            </button>
             <button className="menu-item" onClick={() => navigate('/referrals')}>
               <div className="menu-icon">👥</div>
               <span>Referrals</span>
             </button>
-            <button className="menu-item" onClick={() => navigate('/total-deposits')}>
+            {/* <button className="menu-item" onClick={() => navigate('/total-deposits')}>
               <div className="menu-icon">📈</div>
               <span>Total Deposits</span>
-            </button>
-            <button className="menu-item" onClick={() => navigate('/total-withdraws')}>
-              <div className="menu-icon">📉</div>
-              <span>Total Withdraws</span>
-            </button>
-          </div>
-
-          {/* Shortcuts */}
-          <div className="shortcuts-section">
-            <h3 className="section-title">Quick Links</h3>
-            <div className="shortcuts-grid">
-              <a href="https://wa.me/+923296830617" target="_blank" rel="noopener noreferrer" className="shortcut-item">
-                <div className="shortcut-icon">💬</div>
-                <span>Admin</span>
-              </a>
-              <a href="https://whatsapp.com/channel/0029Vb6f8YMKbYMFUyUzmL2Y" target="_blank" rel="noopener noreferrer" className="shortcut-item">
-                <div className="shortcut-icon">👥</div>
-                <span>Group</span>
-              </a>
-              <a href="https://whatsapp.com/channel/0029Vb6f8YMKbYMFUyUzmL2Y" target="_blank" rel="noopener noreferrer" className="shortcut-item">
-                <div className="shortcut-icon">📢</div>
-                <span>Channel</span>
-              </a>
-              <button className="shortcut-item" onClick={() => alert('SECP Info')}>
-                <div className="shortcut-icon">🛡️</div>
-                <span>SECP</span>
-              </button>
-              <button className="shortcut-item" onClick={() => alert('FBR Info')}>
-                <div className="shortcut-icon">📑</div>
-                <span>FBR</span>
-              </button>
-              <button className="shortcut-item" onClick={handleLogout}>
-                <div className="shortcut-icon">🚪</div>
-                <span>Logout</span>
-              </button>
-            </div>
+            </button> */}
           </div>
 
           {/* Account Overview */}
-          <div className="overview-section">
+          {/* <div className="overview-section">
             <h3 className="section-title">Account Overview</h3>
             <div className="overview-list">
               <div className="overview-item">
@@ -465,7 +426,7 @@ const Dashboard = () => {
                 <span className="overview-value">${userData.teamDeposit.toFixed(2)}</span>
               </div>
             </div>
-          </div>
+          </div> */}
 
         </div>
       </main>
