@@ -9,6 +9,7 @@ import AdViewer from './pages/AdViewer.jsx'
 import Invite from './pages/Invite.jsx'
 import Cashout from './pages/Cashout.jsx'
 import BuyPlan from './pages/BuyPlan.jsx'
+import PaymentInstructions from './pages/PaymentInstructions.jsx'
 import History from './pages/History.jsx'
 import Home from './pages/Home.jsx'
 import About from './pages/About.jsx'
@@ -31,6 +32,7 @@ function App() {
         <Route path="/invite" element={<ProtectedRoute><Invite /></ProtectedRoute>} />
         <Route path="/cashout" element={<ProtectedRoute><Cashout /></ProtectedRoute>} />
         <Route path="/buy-plan" element={<ProtectedRoute><BuyPlan /></ProtectedRoute>} />
+        <Route path="/payment-instructions" element={<ProtectedRoute><PaymentInstructions /></ProtectedRoute>} />
         <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
         
         {/* Main app routes with layout */}

@@ -144,6 +144,36 @@
   color: #1e293b;
 }
 
+/* Make users table scrollable horizontally */
+.users-table {
+  overflow-x: auto;
+  max-width: 100%;
+  position: relative;
+}
+
+.users-table table {
+  min-width: 1400px; /* Ensure table has enough space for all columns */
+}
+
+/* Scrollbar styling for users table */
+.users-table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.users-table::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.users-table::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.users-table::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -155,20 +185,33 @@ thead {
 
 th {
   text-align: left;
-  padding: 12px;
-  font-size: 13px;
+  padding: 10px 8px;
+  font-size: 11px;
   font-weight: 600;
   color: #475569;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
 }
 
 td {
-  padding: 15px 12px;
+  padding: 12px 8px;
   border-bottom: 1px solid #f1f5f9;
-  font-size: 14px;
+  font-size: 13px;
   color: #334155;
+}
+
+/* Compact table cells for users table */
+.users-table td {
+  padding: 10px 8px;
+  font-size: 12px;
+}
+
+.users-table td small {
+  font-size: 10px;
+  display: block;
+  margin-top: 2px;
 }
 
 tbody tr:hover {
@@ -514,14 +557,24 @@ tbody tr:hover {
 /* Action Buttons */
 .action-buttons {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .action-buttons .btn-sm {
-  padding: 6px 12px;
-  font-size: 12px;
+  padding: 5px 10px;
+  font-size: 11px;
   white-space: nowrap;
+  min-width: auto;
+}
+
+.users-table .action-buttons {
+  gap: 4px;
+}
+
+.users-table .action-buttons .btn-sm {
+  padding: 4px 8px;
+  font-size: 10px;
 }
 
 /* Modal Styles */

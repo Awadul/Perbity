@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  totalDeposits: {
+    type: Number,
+    default: 0
+  },
   
   // Earnings by Category
   earnings: {
@@ -98,6 +102,10 @@ const userSchema = new mongoose.Schema({
     default: 10
   },
   lastAdClickDate: {
+    type: Date,
+    default: null
+  },
+  lastAdPackageUpdate: {
     type: Date,
     default: null
   },

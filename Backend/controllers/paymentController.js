@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Payment from '../models/Payment.js';
 import PaymentPlan from '../models/PaymentPlan.js';
 import User from '../models/User.js';
@@ -27,26 +28,47 @@ export const getPaymentPlans = async (req, res, next) => {
 // @access  Private
 export const submitPayment = async (req, res, next) => {
   try {
-    const { paymentPlan, amount, paymentMethod, transactionId } = req.body;
+    const { paymentPlan, planId, amount, paymentMethod, transactionId, accountName, note } = req.body;
     
     // Check if file was uploaded
     if (!req.file) {
       return next(new ErrorResponse('Please upload payment proof image', 400));
     }
     
-    // Verify payment plan exists
-    const plan = await PaymentPlan.findById(paymentPlan);
-    if (!plan) {
-      // Delete uploaded file
-      fs.unlinkSync(req.file.path);
-      return next(new ErrorResponse('Payment plan not found', 404));
-    }
+    // Handle both old format (paymentPlan) and new format (planId)
+    let plan = null;
+    let planIdToUse = paymentPlan || planId;
     
-    // Verify amount matches plan price
-    if (parseFloat(amount) !== plan.price) {
-      // Delete uploaded file
-      fs.unlinkSync(req.file.path);
-      return next(new ErrorResponse(`Amount must be $${plan.price} for ${plan.name} plan`, 400));
+    // If planId is provided and not 'custom', try to find the plan by ID
+    if (planIdToUse && planIdToUse !== 'custom') {
+      plan = await PaymentPlan.findById(planIdToUse);
+      if (!plan) {
+        // Delete uploaded file
+        fs.unlinkSync(req.file.path);
+        return next(new ErrorResponse('Payment plan not found', 404));
+      }
+      
+      // Verify amount matches plan price
+      if (parseFloat(amount) !== plan.price) {
+        // Delete uploaded file
+        fs.unlinkSync(req.file.path);
+        return next(new ErrorResponse(`Amount must be $${plan.price} for ${plan.name} plan`, 400));
+      }
+    } else {
+      // For 'custom' or no planId, try to find a matching plan by amount
+      if (!amount || parseFloat(amount) <= 0) {
+        fs.unlinkSync(req.file.path);
+        return next(new ErrorResponse('Valid amount is required', 400));
+      }
+      
+      // Look for a PaymentPlan matching the exact amount
+      plan = await PaymentPlan.findOne({ price: parseFloat(amount), isActive: true });
+      
+      if (plan) {
+        console.log(`✅ Found matching PaymentPlan for $${amount}: ${plan.name} (${plan.dailyAdsLimit} ads/day)`);
+      } else {
+        console.log(`⚠️ No PaymentPlan found for $${amount}, will use custom plan logic`);
+      }
     }
     
     // Check if user already has an active payment
@@ -74,18 +96,29 @@ export const submitPayment = async (req, res, next) => {
       return next(new ErrorResponse('You already have a pending payment waiting for approval', 400));
     }
     
-    // Create payment
-    const payment = await Payment.create({
+    // Create payment data
+    const paymentData = {
       user: req.user._id,
-      paymentPlan: paymentPlan,
-      amount: amount,
+      amount: parseFloat(amount),
       paymentMethod: paymentMethod || 'binance',
       proofImage: req.file.path,
-      transactionId: transactionId
-    });
+      transactionId: transactionId || null,
+      accountName: accountName || null,
+      adminNotes: note || null
+    };
     
-    // Populate plan details
-    await payment.populate('paymentPlan');
+    // Only add paymentPlan if we have a valid plan
+    if (plan) {
+      paymentData.paymentPlan = plan._id;
+    }
+    
+    // Create payment
+    const payment = await Payment.create(paymentData);
+    
+    // Populate plan details if exists
+    if (payment.paymentPlan) {
+      await payment.populate('paymentPlan');
+    }
     
     res.status(201).json({
       success: true,
@@ -187,7 +220,7 @@ export const getAllPayments = async (req, res, next) => {
 // @access  Private/Admin
 export const approvePayment = async (req, res, next) => {
   try {
-    const payment = await Payment.findById(req.params.id);
+    const payment = await Payment.findById(req.params.id).populate('paymentPlan');
     
     if (!payment) {
       return next(new ErrorResponse('Payment not found', 404));
@@ -197,22 +230,120 @@ export const approvePayment = async (req, res, next) => {
       return next(new ErrorResponse(`Cannot approve payment with status: ${payment.status}`, 400));
     }
     
-    // Deactivate any other active payments for this user
+    console.log(`💰 Processing payment approval for payment ID: ${payment._id}`);
+    console.log(`👤 User ID: ${payment.user}`);
+    console.log(`📦 Payment Plan ID: ${payment.paymentPlan || 'None (Custom Plan)'}`);
+    console.log(`💵 Amount: $${payment.amount}`);
+    
+    // Get user
+    const user = await User.findById(payment.user);
+    
+    if (!user) {
+      console.error(`❌ User not found for payment ${payment._id}`);
+      return next(new ErrorResponse('User not found', 404));
+    }
+    
+    // Deactivate any other active payments for this user (same as assignPackage)
     await Payment.updateMany(
       { user: payment.user, isActive: true },
-      { isActive: false }
+      { isActive: false, status: 'expired' }
     );
     
-    // Approve payment
-    await payment.approve(req.user._id);
+    // Approve and activate the payment (same as assignPackage does with Payment.create)
+    payment.status = 'approved';
+    payment.isActive = true;
+    payment.approvedBy = req.user._id;
+    payment.approvedAt = new Date();
+    payment.activatedAt = new Date();
+    
+    // Set expiration date if plan exists
+    if (payment.paymentPlan) {
+      const plan = payment.paymentPlan;
+      payment.expiresAt = new Date(Date.now() + plan.duration * 24 * 60 * 60 * 1000);
+      
+      console.log(`📦 PaymentPlan found: ${plan.name}`);
+      
+      // Update user's package benefits - SAME AS assignPackage
+      user.maxDailyAds = plan.dailyAdsLimit || 10;
+      user.lastAdPackageUpdate = new Date();
+      
+      // Update totalDeposits
+      if (typeof user.totalDeposits === 'undefined') {
+        user.totalDeposits = 0;
+      }
+      user.totalDeposits += payment.amount;
+      
+      // Add balance
+      user.balance = (user.balance || 0) + payment.amount;
+      
+      await payment.save();
+      await user.save();
+      
+      console.log(`✅ Package assigned successfully! (Same as Users Tab Assignment)`);
+      console.log(`   User: ${user.name} (${user.email})`);
+      console.log(`   Plan: ${plan.name}`);
+      console.log(`   Daily Ads Limit: ${user.maxDailyAds}`);
+      console.log(`   New Balance: $${user.balance.toFixed(2)}`);
+      console.log(`   Total Deposits: $${user.totalDeposits.toFixed(2)}`);
+    } else {
+      // Custom plan without PaymentPlan reference
+      // Set expiration to 1 year for custom plans
+      payment.expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+      
+      console.log(`📦 Custom Plan (No PaymentPlan document)`);
+      
+      // For custom plans, calculate ads based on formula: 3 ads per $100
+      // Formula: (amount / 100) * 3
+      const defaultAdsLimit = Math.floor((payment.amount / 100) * 3);
+      
+      console.log(`   Amount: $${payment.amount}`);
+      console.log(`   Calculated Ads: ${defaultAdsLimit} (formula: ${payment.amount}/100 * 3)`);
+      
+      // Update user's package benefits - SAME AS assignPackage
+      user.maxDailyAds = defaultAdsLimit;
+      user.lastAdPackageUpdate = new Date();
+      
+      // Update totalDeposits
+      if (typeof user.totalDeposits === 'undefined') {
+        user.totalDeposits = 0;
+      }
+      user.totalDeposits += payment.amount;
+      
+      // Add balance
+      user.balance = (user.balance || 0) + payment.amount;
+      
+      await payment.save();
+      await user.save();
+      
+      console.log(`✅ Custom package assigned successfully! (Same as Users Tab Assignment)`);
+      console.log(`   User: ${user.name} (${user.email})`);
+      console.log(`   Amount: $${payment.amount}`);
+      console.log(`   Daily Ads Limit: ${user.maxDailyAds}`);
+      console.log(`   New Balance: $${user.balance.toFixed(2)}`);
+      console.log(`   Total Deposits: $${user.totalDeposits.toFixed(2)}`);
+    }
     
     // Populate details
-    await payment.populate('paymentPlan');
     await payment.populate('user', 'name email');
+    
+    // Verify the payment was saved correctly
+    console.log(`\n📋 Final Payment State:`);
+    console.log(`   Payment ID: ${payment._id}`);
+    console.log(`   Status: ${payment.status}`);
+    console.log(`   isActive: ${payment.isActive}`);
+    console.log(`   Expires At: ${payment.expiresAt}`);
+    
+    // Verify the user was updated
+    const verifyUser = await User.findById(payment.user);
+    console.log(`\n👤 Final User State:`);
+    console.log(`   User: ${verifyUser.name}`);
+    console.log(`   maxDailyAds: ${verifyUser.maxDailyAds}`);
+    console.log(`   Balance: $${verifyUser.balance.toFixed(2)}`);
+    console.log(`   Total Deposits: $${verifyUser.totalDeposits?.toFixed(2) || '0.00'}`);
     
     res.status(200).json({
       success: true,
-      message: 'Payment approved successfully',
+      message: 'Payment approved and package assigned successfully. User can now view ads.',
       data: payment
     });
   } catch (error) {

@@ -39,12 +39,7 @@
 }
 
 .ads-header-new {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   margin-bottom: 32px;
-  gap: 24px;
-  flex-wrap: wrap;
 }
 
 .ads-title {
@@ -57,14 +52,54 @@
 .ads-subtitle {
   font-size: 14px;
   color: #6b7280;
-  margin: 0;
+  margin: 0 0 20px 0;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-box {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-box.highlight {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+}
+
+.stat-box.highlight .stat-label,
+.stat-box.highlight .stat-number {
+  color: white;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 .progress-section {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 200px;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .progress-text {
@@ -210,6 +245,61 @@
 .ad-box.completed {
   background: #f9fafb;
   border-color: #10b981;
+}
+
+/* Completed Overlay Styles */
+.completed-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+.completed-check-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  margin-bottom: 12px;
+}
+
+.completed-check-circle i {
+  color: white;
+  font-size: 20px;
+}
+
+.completed-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 4px 0;
+}
+
+.completed-subtitle {
+  font-size: 14px;
+  color: #d1d5db;
+}
+
+.ad-completed-badge {
+  width: 100%;
+  padding: 10px;
+  background: #dcfce7;
+  color: #16a34a;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
 }
 
 .ad-badge {
@@ -1156,4 +1246,4 @@
     padding: 16px 40px;
     font-size: 16px;
   }
-}
+

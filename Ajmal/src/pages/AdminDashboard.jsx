@@ -158,9 +158,30 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleViewPaymentProof = (paymentId) => {
-    const imageUrl = `${API_BASE_URL}/api/payments/${paymentId}/image`;
-    window.open(imageUrl, '_blank');
+  const handleViewPaymentProof = async (paymentId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const imageUrl = `${API_BASE_URL}/api/payments/${paymentId}/image`;
+      
+      // Fetch the image with authorization header
+      const response = await fetch(imageUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to load image');
+      }
+      
+      // Create blob from response and open in new tab
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } catch (error) {
+      console.error('Failed to view payment proof:', error);
+      alert('Failed to load payment proof image');
+    }
   };
 
   const handleAssignPackage = (user) => {
@@ -541,7 +562,7 @@ const AdminDashboard = () => {
                     <th>Total Earnings</th>
                     <th>Today's Ads</th>
                     <th>Level</th>
-                    <th>Referrals</th>
+                    {/* <th>Referrals</th> */}
                     <th>Withdrawn</th>
                     <th>Status</th>
                     <th>Joined</th>
@@ -651,8 +672,8 @@ const AdminDashboard = () => {
               <thead>
                 <tr>
                   <th>User</th>
-                  <th>Plan</th>
-                  <th>Amount</th>
+                  <th>Plan Details</th>
+                  <th>Account Name</th>
                   <th>Proof</th>
                   <th>Status</th>
                   <th>Date</th>
@@ -662,9 +683,33 @@ const AdminDashboard = () => {
               <tbody>
                 {payments.map(payment => (
                   <tr key={payment._id}>
-                    <td>{payment.user?.name}</td>
-                    <td>{payment.plan?.name}</td>
-                    <td>${payment.plan?.price}</td>
+                    <td>
+                      <div>{payment.user?.name}</div>
+                      <small style={{color: '#666'}}>{payment.user?.email}</small>
+                    </td>
+                    <td>
+                      <div>
+                        {payment.paymentPlan ? (
+                          <>
+                            <div><strong>{payment.paymentPlan.name}</strong></div>
+                            <small style={{color: '#666'}}>
+                              Price: ${payment.paymentPlan.price} | 
+                              Daily: ${payment.paymentPlan.dailyProfit} | 
+                              Duration: {payment.paymentPlan.duration} days
+                            </small>
+                          </>
+                        ) : (
+                          <>
+                            <div><strong>Custom Plan</strong></div>
+                            <small style={{color: '#666'}}>
+                              Amount: ${payment.amount}
+                              {payment.adminNotes && ` | ${payment.adminNotes}`}
+                            </small>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                    <td>{payment.accountName || 'N/A'}</td>
                     <td>
                       <button 
                         onClick={() => handleViewPaymentProof(payment._id)}
@@ -679,22 +724,27 @@ const AdminDashboard = () => {
                       </span>
                     </td>
                     <td>{new Date(payment.createdAt).toLocaleDateString()}</td>
-                    <td>
+                    <td className="action-buttons">
                       {payment.status === 'pending' && (
                         <>
                           <button 
                             onClick={() => handleApprovePayment(payment._id)}
                             className="btn-success btn-sm"
                           >
-                            Approve
+                            ✓ Approve
                           </button>
                           <button 
                             onClick={() => handleRejectPayment(payment._id)}
                             className="btn-danger btn-sm"
                           >
-                            Reject
+                            ✗ Reject
                           </button>
                         </>
+                      )}
+                      {payment.status === 'approved' && payment.isActive && (
+                        <span style={{color: '#4CAF50', fontSize: '12px'}}>
+                          ✓ Active until {payment.expiresAt ? new Date(payment.expiresAt).toLocaleDateString() : 'N/A'}
+                        </span>
                       )}
                     </td>
                   </tr>

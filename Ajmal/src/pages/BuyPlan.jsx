@@ -116,8 +116,8 @@ const BuyPlan = () => {
   };
 
   const handleContinueToPayment = () => {
-    // Navigate to payment page with selected plan details
-    navigate('/payment', { state: { plan: selectedPlan } });
+    // Navigate to payment instructions page with selected plan details
+    navigate('/payment-instructions', { state: { plan: selectedPlan } });
   };
 
   if (loading) {

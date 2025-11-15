@@ -20,6 +20,7 @@ router.get('/plans', getPaymentPlans);
 
 // Protected routes (user)
 router.post('/', protect, authLimiter, upload.single('proofImage'), handleUploadError, submitPayment);
+router.post('/submit', protect, authLimiter, upload.single('proofImage'), handleUploadError, submitPayment);
 router.get('/my-payments', protect, getMyPayments);
 router.get('/active', protect, getActivePayment);
 router.get('/:id/image', protect, getPaymentImage);

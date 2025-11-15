@@ -43,18 +43,29 @@ class ApiService {
       
       if (!response.ok) {
         // Handle 401 Unauthorized
-        if (response.status === 401) {
-          this.removeAuthToken();
-          localStorage.removeItem('user');
-          localStorage.removeItem('isAuthenticated');
-          window.location.href = '/login';
+        if (response.status === 401 && !options.skipAuth) {
+          const currentPath = window.location.pathname;
+          const isAuthPage = currentPath === '/login' || currentPath === '/signup';
+          
+          // Only redirect and clear auth if not already on auth pages
+          if (!isAuthPage) {
+            this.removeAuthToken();
+            localStorage.removeItem('user');
+            localStorage.removeItem('isAuthenticated');
+            window.location.href = '/login';
+          }
         }
         throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
       
       return data;
     } catch (error) {
-      console.error('API request failed:', error);
+      // Only log errors if not on auth pages to reduce console noise
+      const currentPath = window.location.pathname;
+      const isAuthPage = currentPath === '/login' || currentPath === '/signup';
+      if (!isAuthPage) {
+        console.error('API request failed:', error);
+      }
       throw error;
     }
   }

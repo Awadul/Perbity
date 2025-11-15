@@ -22,6 +22,10 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
+        // Check current path first before any API calls
+        const currentPath = window.location.pathname;
+        const isAuthPage = currentPath === '/login' || currentPath === '/signup';
+        
         const token = apiService.getAuthToken();
         const localUser = getCurrentUserLocal();
         
@@ -30,9 +34,6 @@ export const AppProvider = ({ children }) => {
           setIsAuthenticated(true);
           
           // Only refresh user data from server if not on auth pages
-          const currentPath = window.location.pathname;
-          const isAuthPage = currentPath === '/login' || currentPath === '/signup';
-          
           if (!isAuthPage) {
             // Optionally refresh user data from server
             try {
@@ -42,7 +43,7 @@ export const AppProvider = ({ children }) => {
               }
             } catch (error) {
               // Silently fail - keep using local user data if refresh fails
-              // This prevents console errors on login page when backend is starting
+              console.debug('Could not refresh user data from server');
             }
           }
         } else {

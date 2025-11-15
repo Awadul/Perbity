@@ -20,6 +20,20 @@ export const getProfile = async (req, res, next) => {
       status: 'approved'
     }).populate('paymentPlan');
 
+    console.log(`\n🔍 Getting profile for user: ${user.name} (${req.user.id})`);
+    console.log(`   Active Payment Found: ${activePayment ? 'YES' : 'NO'}`);
+    if (activePayment) {
+      console.log(`   Payment ID: ${activePayment._id}`);
+      console.log(`   Payment Status: ${activePayment.status}`);
+      console.log(`   Payment isActive: ${activePayment.isActive}`);
+      console.log(`   Has PaymentPlan: ${activePayment.paymentPlan ? 'YES' : 'NO'}`);
+      if (activePayment.paymentPlan) {
+        console.log(`   Plan Name: ${activePayment.paymentPlan.name}`);
+        console.log(`   Daily Ads Limit: ${activePayment.paymentPlan.dailyAdsLimit}`);
+      }
+    }
+    console.log(`   User maxDailyAds: ${user.maxDailyAds}`);
+
     // Check if payment expired
     if (activePayment) {
       activePayment.checkExpiration();
@@ -28,24 +42,58 @@ export const getProfile = async (req, res, next) => {
 
     // Attach active payment to user response
     const userResponse = user.toObject();
-    userResponse.activePayment = activePayment ? {
-      _id: activePayment._id,
-      plan: {
-        _id: activePayment.paymentPlan._id,
-        name: activePayment.paymentPlan.name,
-        price: activePayment.paymentPlan.price,
-        dailyAdsLimit: activePayment.paymentPlan.dailyAdsLimit,
-        dailyProfit: activePayment.paymentPlan.dailyProfit,
-        profitPercentage: activePayment.paymentPlan.profitPercentage,
-        duration: activePayment.paymentPlan.duration,
-        features: activePayment.paymentPlan.features
-      },
-      amount: activePayment.amount,
-      status: activePayment.status,
-      isActive: activePayment.isActive,
-      createdAt: activePayment.createdAt,
-      expiresAt: activePayment.expiresAt
-    } : null;
+    
+    if (activePayment && activePayment.paymentPlan) {
+      // Payment with PaymentPlan reference
+      userResponse.activePayment = {
+        _id: activePayment._id,
+        plan: {
+          _id: activePayment.paymentPlan._id,
+          name: activePayment.paymentPlan.name,
+          price: activePayment.paymentPlan.price,
+          dailyAdsLimit: activePayment.paymentPlan.dailyAdsLimit,
+          dailyProfit: activePayment.paymentPlan.dailyProfit,
+          profitPercentage: activePayment.paymentPlan.profitPercentage,
+          duration: activePayment.paymentPlan.duration,
+          features: activePayment.paymentPlan.features
+        },
+        amount: activePayment.amount,
+        status: activePayment.status,
+        isActive: activePayment.isActive,
+        createdAt: activePayment.createdAt,
+        expiresAt: activePayment.expiresAt
+      };
+    } else if (activePayment && !activePayment.paymentPlan) {
+      // Custom payment without PaymentPlan reference
+      // Create a virtual plan object from user's maxDailyAds
+      const dailyAdsFromUser = user.maxDailyAds || 10;
+      const dailyProfitEstimate = activePayment.amount * 0.03; // 3% daily
+      
+      userResponse.activePayment = {
+        _id: activePayment._id,
+        plan: {
+          _id: 'custom',
+          name: 'Custom Package',
+          price: activePayment.amount,
+          dailyAdsLimit: dailyAdsFromUser,
+          dailyProfit: dailyProfitEstimate,
+          profitPercentage: 3,
+          duration: 365,
+          features: [
+            `Investment: $${activePayment.amount}`,
+            `Daily Ads: ${dailyAdsFromUser}`,
+            `Daily Profit: $${dailyProfitEstimate.toFixed(2)}`
+          ]
+        },
+        amount: activePayment.amount,
+        status: activePayment.status,
+        isActive: activePayment.isActive,
+        createdAt: activePayment.createdAt,
+        expiresAt: activePayment.expiresAt
+      };
+    } else {
+      userResponse.activePayment = null;
+    }
 
     // Get today's ads viewed count
     const AdClick = (await import('../models/AdClick.js')).default;

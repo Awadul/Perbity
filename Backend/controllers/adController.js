@@ -29,14 +29,25 @@ export const getAds = async (req, res, next) => {
       await activePayment.save();
     }
     
+    // Get user data for maxDailyAds (used for custom plans)
+    const user = await User.findById(req.user._id);
+    
     // Determine daily ads limit based on payment plan
     let dailyAdsLimit = 10; // Default free plan limit
     let planName = 'Free';
     
-    if (activePayment && activePayment.isActive && activePayment.paymentPlan) {
-      dailyAdsLimit = activePayment.paymentPlan.dailyAdsLimit || 10;
-      planName = activePayment.paymentPlan.name || 'Unknown Plan';
-      console.log(`User has active plan: ${planName}, Daily Limit: ${dailyAdsLimit}`);
+    if (activePayment && activePayment.isActive) {
+      if (activePayment.paymentPlan) {
+        // Payment with PaymentPlan reference
+        dailyAdsLimit = activePayment.paymentPlan.dailyAdsLimit || 10;
+        planName = activePayment.paymentPlan.name || 'Unknown Plan';
+        console.log(`User has PaymentPlan: ${planName}, Daily Limit: ${dailyAdsLimit}`);
+      } else {
+        // Custom payment without PaymentPlan, use user.maxDailyAds
+        dailyAdsLimit = user.maxDailyAds || 10;
+        planName = activePayment.customPlanName || 'Custom Package';
+        console.log(`User has Custom Plan: ${planName}, Daily Limit: ${dailyAdsLimit} (from user.maxDailyAds)`);
+      }
     } else {
       console.log('User has no active plan, using free plan limit: 10');
     }
@@ -123,10 +134,19 @@ export const clickAd = async (req, res, next) => {
       await activePayment.save();
     }
     
+    // Get user data for maxDailyAds
+    const user = await User.findById(req.user._id);
+    
     // Determine daily ads limit
     let dailyAdsLimit = 10; // Default free plan
     if (activePayment && activePayment.isActive) {
-      dailyAdsLimit = activePayment.paymentPlan.dailyAdsLimit;
+      if (activePayment.paymentPlan) {
+        // Payment with PaymentPlan reference
+        dailyAdsLimit = activePayment.paymentPlan.dailyAdsLimit;
+      } else {
+        // Custom payment, use user.maxDailyAds
+        dailyAdsLimit = user.maxDailyAds || 10;
+      }
     }
     
     // Check if user has reached daily limit
@@ -161,9 +181,6 @@ export const clickAd = async (req, res, next) => {
       verifiedAt: Date.now(),
       clickDuration: 10 // 10 second viewing
     });
-
-    // Update user's earnings using the addEarnings method
-    const user = await User.findById(req.user._id);
     
     // Reset daily stats if needed
     user.resetDailyStats();

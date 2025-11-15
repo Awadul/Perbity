@@ -9,7 +9,8 @@ const paymentSchema = new mongoose.Schema({
   paymentPlan: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PaymentPlan',
-    required: true
+    required: false,
+    default: null
   },
   amount: {
     type: Number,
@@ -20,6 +21,11 @@ const paymentSchema = new mongoose.Schema({
     type: String,
     enum: ['binance', 'paypal', 'bank', 'crypto', 'other'],
     default: 'binance'
+  },
+  accountName: {
+    type: String,
+    trim: true,
+    default: null
   },
   proofImage: {
     type: String, // Path to uploaded image

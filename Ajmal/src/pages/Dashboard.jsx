@@ -353,12 +353,12 @@ const Dashboard = () => {
           </div>
 
           {/* Team Reward Banner */}
-          <div className="team-reward-banner">
+          {/* <div className="team-reward-banner">
             <button className="reward-btn" onClick={() => navigate('/referrals')}>
               Team Reward
             </button>
             <div className="trophy-icon">🏆</div>
-          </div>
+          </div> */}
 
           {/* Menu Grid */}
           <div className="menu-grid">
@@ -383,10 +383,10 @@ const Dashboard = () => {
               <div className="menu-icon">📊</div>
               <span>History</span>
             </button>
-            <button className="menu-item" onClick={() => navigate('/referrals')}>
+            {/* <button className="menu-item" onClick={() => navigate('/referrals')}>
               <div className="menu-icon">👥</div>
               <span>Referrals</span>
-            </button>
+            </button> */}
             {/* <button className="menu-item" onClick={() => navigate('/total-deposits')}>
               <div className="menu-icon">📈</div>
               <span>Total Deposits</span>
@@ -445,10 +445,10 @@ const Dashboard = () => {
           <div className="nav-icon">💰</div>
           <span>Buy</span>
         </button>
-        <button className="nav-item" onClick={() => navigate('/invite')}>
+        {/* <button className="nav-item" onClick={() => navigate('/invite')}>
           <div className="nav-icon">👥</div>
           <span>Invite</span>
-        </button>
+        </button> */}
         <button className="nav-item" onClick={() => navigate('/dashboard')}>
           <div className="nav-icon">📊</div>
           <span>Account</span>

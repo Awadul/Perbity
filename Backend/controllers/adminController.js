@@ -380,12 +380,26 @@ export const assignPackage = async (req, res, next) => {
       expiresAt: new Date(Date.now() + plan.duration * 24 * 60 * 60 * 1000)
     });
     
+    // Update user's package benefits - assign daily ads limit
+    user.maxDailyAds = plan.dailyAdsLimit || 10;
+    user.lastAdPackageUpdate = new Date();
+    
+    // Update totalDeposits
+    if (typeof user.totalDeposits === 'undefined') {
+      user.totalDeposits = 0;
+    }
+    user.totalDeposits += plan.price;
+    
+    await user.save();
+    
     await payment.populate('paymentPlan');
     await payment.populate('user', 'name email');
     
+    console.log(`✅ Package assigned to user ${user.name}: ${plan.name} with ${plan.dailyAdsLimit} daily ads`);
+    
     res.status(200).json({
       success: true,
-      message: `${plan.name} package assigned to ${user.name} successfully`,
+      message: `${plan.name} package assigned to ${user.name} successfully. User can now view ${plan.dailyAdsLimit} ads daily.`,
       data: payment
     });
   } catch (error) {
