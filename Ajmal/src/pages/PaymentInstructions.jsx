@@ -136,11 +136,11 @@ const PaymentInstructions = () => {
 
         {/* Payment Instructions Image */}
         <div className="instructions-card">
-          <h2>📋 Payment Instructions</h2>
+          <h2>💰 Binance Payment Instructions</h2>
           <div className="instructions-image-wrapper">
             <img 
-              src="/payment-instructions.jpg" 
-              alt="Payment Instructions" 
+              src="/binance_instruction.jpg" 
+              alt="Binance Payment Instructions" 
               className="instructions-image"
               onError={(e) => {
                 e.target.style.display = 'none';
@@ -148,20 +148,16 @@ const PaymentInstructions = () => {
               }}
             />
             <div className="instructions-placeholder" style={{display: 'none'}}>
-              <div className="placeholder-icon">💳</div>
-              <h3>Payment Instructions</h3>
+              <div className="placeholder-icon">💰</div>
+              <h3>Binance Payment Instructions</h3>
               <div className="instruction-steps">
-                <p>1. Send <strong>${selectedPlan.amount}</strong> to the account details below:</p>
-                <div className="account-details">
-                  <p><strong>Bank:</strong> Allied Bank Limited</p>
-                  <p><strong>Account Title:</strong> Perbity Investment</p>
-                  <p><strong>Account Number:</strong> 1234567890</p>
-                  <p><strong>IBAN:</strong> PK12ABCD0000001234567890</p>
-                </div>
-                <p>2. Take a screenshot or photo of the payment receipt</p>
-                <p>3. Fill in your account name below</p>
-                <p>4. Upload the payment proof</p>
-                <p>5. Submit for verification</p>
+                <p>1. Open your Binance app and scan the QR code above</p>
+                <p>2. Send <strong>${selectedPlan.amount} USDT</strong> to the wallet address</p>
+                <p>3. Complete the payment in your Binance app</p>
+                <p>4. Take a screenshot of the transaction confirmation</p>
+                <p>5. Enter your Binance account name or transaction ID below</p>
+                <p>6. Upload the payment proof screenshot</p>
+                <p>7. Submit for verification</p>
               </div>
             </div>
           </div>
@@ -170,13 +166,13 @@ const PaymentInstructions = () => {
         {/* Payment Form */}
         <form onSubmit={handleSubmit} className="payment-form">
           <div className="form-group">
-            <label htmlFor="accountName">Account Name / Transaction ID *</label>
+            <label htmlFor="accountName">Binance Account Name / Transaction ID *</label>
             <input
               type="text"
               id="accountName"
               value={accountName}
               onChange={(e) => setAccountName(e.target.value)}
-              placeholder="Enter your account name or transaction ID"
+              placeholder="Enter your Binance account name or TxID"
               disabled={loading}
             />
             {errors.accountName && <span className="error-text">{errors.accountName}</span>}
@@ -231,9 +227,11 @@ const PaymentInstructions = () => {
         <div className="notes-card">
           <h3>⚠️ Important Notes</h3>
           <ul>
-            <li>Make sure to upload a clear image of your payment receipt</li>
+            <li>Payment must be made via Binance USDT (TRC20 or BEP20)</li>
+            <li>Scan the QR code with your Binance app to pay</li>
+            <li>Upload a clear screenshot of your transaction confirmation</li>
             <li>Your plan will be activated within 24 hours after verification</li>
-            <li>Keep your transaction ID for reference</li>
+            <li>Keep your transaction ID (TxID) for reference</li>
             <li>Contact support if you face any issues</li>
           </ul>
         </div>
