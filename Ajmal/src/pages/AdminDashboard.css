@@ -311,6 +311,15 @@ tbody tr:hover {
   background: #5568d3;
 }
 
+.btn-info {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-info:hover {
+  background: #2563eb;
+}
+
 .admin-loading {
   display: flex;
   flex-direction: column;

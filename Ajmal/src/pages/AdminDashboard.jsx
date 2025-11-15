@@ -184,6 +184,32 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleViewQrCode = async (checkoutId, qrCodePath) => {
+    try {
+      const token = localStorage.getItem('token');
+      const imageUrl = `${API_BASE_URL}/api/checkouts/${checkoutId}/qr-code`;
+      
+      // Fetch the image with authorization header
+      const response = await fetch(imageUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to load QR code');
+      }
+      
+      // Create blob from response and open in new tab
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } catch (error) {
+      console.error('Failed to view QR code:', error);
+      alert('Failed to load QR code image');
+    }
+  };
+
   const handleAssignPackage = (user) => {
     setSelectedUser(user);
     setSelectedPlan('');
@@ -361,12 +387,12 @@ const AdminDashboard = () => {
         >
           Checkouts ({Array.isArray(checkouts) ? checkouts.filter(c => c.status === 'pending').length : 0})
         </button>
-        <button 
+        {/* <button 
           className={`tab ${activeTab === 'ads' ? 'active' : ''}`}
           onClick={() => setActiveTab('ads')}
         >
           Ads ({Array.isArray(ads) ? ads.length : 0})
-        </button>
+        </button> */}
       </div>
 
       <div className="admin-content">
@@ -757,7 +783,7 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {activeTab === 'ads' && (
+        {/* {activeTab === 'ads' && (
           <div className="ads-table">
             <div className="table-header">
               <h2>Ads Management</h2>
@@ -832,7 +858,7 @@ const AdminDashboard = () => {
               <p className="no-data">No ads found. Create your first ad!</p>
             )}
           </div>
-        )}
+        )} */}
 
         {activeTab === 'checkouts' && (
           <div className="checkouts-table">
@@ -880,8 +906,18 @@ const AdminDashboard = () => {
                           </>
                         ) : checkout.paymentMethod === 'binance' ? (
                           <>
-                            <div><strong>ID:</strong> {checkout.paymentDetails?.binanceId || 'N/A'}</div>
-                            <div><strong>Email:</strong> {checkout.paymentDetails?.email || 'N/A'}</div>
+                            {checkout.qrCodeImage && (
+                              <div>
+                                <button 
+                                  onClick={() => handleViewQrCode(checkout._id, checkout.qrCodeImage)}
+                                  className="btn-info btn-sm"
+                                  style={{marginBottom: '5px'}}
+                                >
+                                  View QR Code
+                                </button>
+                              </div>
+                            )}
+                            <div><strong>Amount:</strong> ${checkout.amount} USDT</div>
                           </>
                         ) : checkout.paymentMethod === 'crypto' ? (
                           <>

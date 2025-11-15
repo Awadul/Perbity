@@ -281,6 +281,85 @@
   font-weight: 500;
 }
 
+.form-helper-text {
+  font-size: 12px;
+  color: #6b7280;
+  margin: -4px 0 4px 0;
+}
+
+/* File Upload Styles */
+.file-input-wrapper {
+  position: relative;
+}
+
+.file-select-btn {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px dashed #ff9800;
+  border-radius: 10px;
+  background: #fff8f0;
+  color: #ff9800;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.file-select-btn:hover:not(:disabled) {
+  background: #ff9800;
+  color: white;
+  border-style: solid;
+}
+
+.file-select-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.file-icon {
+  font-size: 18px;
+}
+
+.qr-preview {
+  margin-top: 15px;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid #e0e0e0;
+  background: #f5f5f5;
+}
+
+.qr-preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 400px;
+  object-fit: contain;
+}
+
+.remove-qr-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(244, 67, 54, 0.9);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.remove-qr-btn:hover {
+  background: #f44336;
+}
+
 /* ========================================
    SUBMIT BUTTON
    ======================================== */

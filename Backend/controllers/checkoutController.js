@@ -12,40 +12,72 @@ export const createCheckout = async (req, res, next) => {
     const { amount, paymentMethod, paymentDetails, requestNote } = req.body;
     
     // Validation
-    if (!amount || !paymentMethod || !paymentDetails) {
-      return next(new ErrorResponse('Please provide all required fields', 400));
+    if (!amount || !paymentMethod) {
+      return next(new ErrorResponse('Please provide amount and payment method', 400));
+    }
+    
+    // Convert amount to number
+    const numAmount = parseFloat(amount);
+    
+    if (isNaN(numAmount) || numAmount <= 0) {
+      // Delete uploaded file if exists
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
+      return next(new ErrorResponse('Invalid amount', 400));
+    }
+    
+    // Check if QR code image was uploaded (required for Binance)
+    if (paymentMethod === 'binance' && !req.file) {
+      return next(new ErrorResponse('Please upload your Binance QR code', 400));
     }
     
     // Check minimum balance
-    if (req.user.balance < amount) {
+    if (req.user.balance < numAmount) {
+      // Delete uploaded file if exists
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
       return next(new ErrorResponse(`Insufficient balance. Available: $${req.user.balance}`, 400));
     }
     
     // Check if user has pending checkout
     const hasPending = await Checkout.hasPendingCheckout(req.user._id);
     if (hasPending) {
+      // Delete uploaded file if exists
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
       return next(new ErrorResponse('You already have a pending checkout request', 400));
     }
     
     // Deduct amount from user balance immediately
-    req.user.balance -= amount;
+    req.user.balance -= numAmount;
     await req.user.save();
 
-    // Create checkout
-    const checkout = await Checkout.create({
+    // Create checkout data
+    const checkoutData = {
       user: req.user._id,
-      amount,
+      amount: numAmount,
       paymentMethod,
-      paymentDetails,
+      paymentDetails: paymentDetails ? JSON.parse(paymentDetails) : {},
       requestNote
-    });
+    };
+
+    // Add QR code image if uploaded
+    if (req.file) {
+      checkoutData.qrCodeImage = req.file.path;
+    }
+
+    // Create checkout
+    const checkout = await Checkout.create(checkoutData);
 
     // Add to history
     await History.addRecord(
       req.user._id,
       'withdrawal',
-      -amount,
-      `Withdrawal request of $${amount.toFixed(2)} via ${paymentMethod}`,
+      -numAmount,
+      `Withdrawal request of $${numAmount.toFixed(2)} via ${paymentMethod}`,
       {
         status: 'pending',
         reference: checkout._id,
@@ -367,6 +399,33 @@ export const getCheckoutStats = async (req, res, next) => {
         totalAmount: totalAmount[0]?.total || 0
       }
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get checkout QR code image (Admin)
+// @route   GET /api/checkouts/:id/qr-code
+// @access  Private/Admin
+export const getCheckoutQrCode = async (req, res, next) => {
+  try {
+    const checkout = await Checkout.findById(req.params.id);
+    
+    if (!checkout) {
+      return next(new ErrorResponse('Checkout not found', 404));
+    }
+    
+    if (!checkout.qrCodeImage) {
+      return next(new ErrorResponse('QR code not found for this checkout', 404));
+    }
+    
+    // Check if file exists (path is already absolute)
+    if (!fs.existsSync(checkout.qrCodeImage)) {
+      return next(new ErrorResponse('QR code file not found', 404));
+    }
+    
+    // Send file directly (path is already absolute)
+    res.sendFile(checkout.qrCodeImage);
   } catch (error) {
     next(error);
   }

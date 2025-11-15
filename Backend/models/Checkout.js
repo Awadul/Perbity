@@ -48,6 +48,10 @@ const checkoutSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  qrCodeImage: {
+    type: String, // User's Binance QR code uploaded during checkout request
+    default: null
+  },
   proofImage: {
     type: String, // Payment proof uploaded by admin
     default: null

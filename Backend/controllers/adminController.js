@@ -380,22 +380,24 @@ export const assignPackage = async (req, res, next) => {
       expiresAt: new Date(Date.now() + plan.duration * 24 * 60 * 60 * 1000)
     });
     
-    // Update user's package benefits - assign daily ads limit
+    // Update user's package benefits - activate plan only
     user.maxDailyAds = plan.dailyAdsLimit || 10;
     user.lastAdPackageUpdate = new Date();
     
-    // Update totalDeposits
+    // Update totalDeposits (track investment amount)
     if (typeof user.totalDeposits === 'undefined') {
       user.totalDeposits = 0;
     }
     user.totalDeposits += plan.price;
+    
+    // DO NOT add balance - user earns balance by watching ads only
     
     await user.save();
     
     await payment.populate('paymentPlan');
     await payment.populate('user', 'name email');
     
-    console.log(`✅ Package assigned to user ${user.name}: ${plan.name} with ${plan.dailyAdsLimit} daily ads`);
+    console.log(`✅ Package assigned to user ${user.name}: ${plan.name} with ${plan.dailyAdsLimit} daily ads (no balance added)`);
     
     res.status(200).json({
       success: true,

@@ -9,8 +9,8 @@ const Cashout = () => {
   const { user, isAuthenticated } = useAppContext();
   const [language, setLanguage] = useState('en'); // 'en' or 'ur'
   const [amount, setAmount] = useState('');
-  const [easypaisaPhone, setEasypaisaPhone] = useState('');
-  const [easypaisaName, setEasypaisaName] = useState('');
+  const [binanceQrCode, setBinanceQrCode] = useState(null);
+  const [qrPreview, setQrPreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [userBalance, setUserBalance] = useState(0);
@@ -50,10 +50,9 @@ const Cashout = () => {
       available247: 'Available 24/7',
       amountLabel: 'Withdrawal Amount',
       amountPlaceholder: 'Enter amount ($50 - $10,000)',
-      phoneLabel: 'EasyPaisa Phone Number',
-      phonePlaceholder: 'Enter your EasyPaisa phone (03XXXXXXXXX)',
-      nameLabel: 'Account Holder Name',
-      namePlaceholder: 'Enter name as per EasyPaisa account',
+      qrCodeLabel: 'Your Binance QR Code',
+      qrCodePlaceholder: 'Upload your Binance receive QR code',
+      qrCodeHelper: 'Take a screenshot of your Binance receive QR code',
       submitButton: 'Submit Withdrawal',
       methods: {
         bank: 'Bank Transfer',
@@ -75,10 +74,9 @@ const Cashout = () => {
       available247: '24/7 دستیاب',
       amountLabel: 'نکلوانے کی رقم',
       amountPlaceholder: 'رقم درج کریں ($50 - $10,000)',
-      phoneLabel: 'ایزی پیسہ فون نمبر',
-      phonePlaceholder: 'اپنا ایزی پیسہ فون نمبر درج کریں (03XXXXXXXXX)',
-      nameLabel: 'اکاؤنٹ ہولڈر کا نام',
-      namePlaceholder: 'ایزی پیسہ اکاؤنٹ کے مطابق نام درج کریں',
+      qrCodeLabel: 'آپ کا Binance QR کوڈ',
+      qrCodePlaceholder: 'اپنا Binance وصول کرنے کا QR کوڈ اپ لوڈ کریں',
+      qrCodeHelper: 'اپنے Binance وصول کرنے کے QR کوڈ کا اسکرین شاٹ لیں',
       submitButton: 'نکلوانے کی درخواست جمع کرائیں',
       methods: {
         bank: 'بینک ٹرانسفر',
@@ -93,6 +91,33 @@ const Cashout = () => {
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'ur' : 'en');
+  };
+
+  const handleQrCodeChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setErrors({ ...errors, qrCode: language === 'en' ? 'Please upload an image file' : 'براہ کرم تصویر اپ لوڈ کریں' });
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors({ ...errors, qrCode: language === 'en' ? 'Image size should be less than 5MB' : 'تصویر کا سائز 5MB سے کم ہونا چاہیے' });
+        return;
+      }
+
+      setBinanceQrCode(file);
+      setErrors({ ...errors, qrCode: null });
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setQrPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -112,18 +137,9 @@ const Cashout = () => {
       newErrors.amount = language === 'en' ? `Insufficient balance. Available: $${userBalance.toFixed(2)}` : `ناکافی بیلنس۔ دستیاب: $${userBalance.toFixed(2)}`;
     }
 
-    // Validate phone
-    if (!easypaisaPhone) {
-      newErrors.phone = language === 'en' ? 'Phone number is required' : 'فون نمبر درج کرنا ضروری ہے';
-    } else if (!/^03\d{9}$/.test(easypaisaPhone)) {
-      newErrors.phone = language === 'en' ? 'Invalid phone format (03XXXXXXXXX)' : 'غلط فون فارمیٹ (03XXXXXXXXX)';
-    }
-
-    // Validate name
-    if (!easypaisaName) {
-      newErrors.name = language === 'en' ? 'Name is required' : 'نام درج کرنا ضروری ہے';
-    } else if (easypaisaName.length < 3) {
-      newErrors.name = language === 'en' ? 'Name must be at least 3 characters' : 'نام کم از کم 3 حروف کا ہونا چاہیے';
+    // Validate QR code
+    if (!binanceQrCode) {
+      newErrors.qrCode = language === 'en' ? 'Binance QR code is required' : 'Binance QR کوڈ ضروری ہے';
     }
 
     setErrors(newErrors);
@@ -132,16 +148,14 @@ const Cashout = () => {
       try {
         setLoading(true);
         
-        const response = await apiService.post('/checkouts', {
-          amount: numAmount,
-          paymentMethod: 'easypaisa',
-          paymentDetails: {
-            phoneNumber: easypaisaPhone,
-            accountHolderName: easypaisaName,
-            accountName: easypaisaName
-          },
-          requestNote: `EasyPaisa withdrawal - ${easypaisaPhone}`
-        });
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append('amount', numAmount);
+        formData.append('paymentMethod', 'binance');
+        formData.append('qrCodeImage', binanceQrCode);
+        formData.append('requestNote', `Binance USDT withdrawal - $${numAmount}`);
+
+        const response = await apiService.upload('/checkouts', formData);
 
         if (response.success) {
           alert(language === 'en' 
@@ -150,8 +164,8 @@ const Cashout = () => {
           
           // Reset form
           setAmount('');
-          setEasypaisaPhone('');
-          setEasypaisaName('');
+          setBinanceQrCode(null);
+          setQrPreview(null);
           fetchUserBalance(); // Refresh balance
         }
       } catch (error) {
@@ -243,28 +257,44 @@ const Cashout = () => {
             </div>
 
             <div className="form-group">
-              <label>{content[language].phoneLabel}</label>
-              <input
-                type="tel"
-                value={easypaisaPhone}
-                onChange={(e) => setEasypaisaPhone(e.target.value)}
-                placeholder={content[language].phonePlaceholder}
-                maxLength="11"
-                disabled={userBalance < 50}
-              />
-              {errors.phone && <span className="error-text">{errors.phone}</span>}
-            </div>
-
-            <div className="form-group">
-              <label>{content[language].nameLabel}</label>
-              <input
-                type="text"
-                value={easypaisaName}
-                onChange={(e) => setEasypaisaName(e.target.value)}
-                placeholder={content[language].namePlaceholder}
-                disabled={userBalance < 50}
-              />
-              {errors.name && <span className="error-text">{errors.name}</span>}
+              <label>{content[language].qrCodeLabel}</label>
+              <p className="form-helper-text">{content[language].qrCodeHelper}</p>
+              <div className="file-input-wrapper">
+                <input
+                  type="file"
+                  id="qrCodeImage"
+                  accept="image/*"
+                  onChange={handleQrCodeChange}
+                  disabled={userBalance < 50 || loading}
+                  style={{ display: 'none' }}
+                />
+                <button
+                  type="button"
+                  className="file-select-btn"
+                  onClick={() => document.getElementById('qrCodeImage').click()}
+                  disabled={userBalance < 50 || loading}
+                >
+                  <span className="file-icon">📷</span>
+                  {binanceQrCode ? binanceQrCode.name : content[language].qrCodePlaceholder}
+                </button>
+              </div>
+              {errors.qrCode && <span className="error-text">{errors.qrCode}</span>}
+              
+              {qrPreview && (
+                <div className="qr-preview">
+                  <img src={qrPreview} alt="Binance QR Code Preview" />
+                  <button
+                    type="button"
+                    className="remove-qr-btn"
+                    onClick={() => {
+                      setBinanceQrCode(null);
+                      setQrPreview(null);
+                    }}
+                  >
+                    ✕ Remove
+                  </button>
+                </div>
+              )}
             </div>
 
             <button 

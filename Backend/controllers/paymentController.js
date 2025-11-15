@@ -263,27 +263,26 @@ export const approvePayment = async (req, res, next) => {
       
       console.log(`📦 PaymentPlan found: ${plan.name}`);
       
-      // Update user's package benefits - SAME AS assignPackage
+      // Update user's package benefits - activate plan only
       user.maxDailyAds = plan.dailyAdsLimit || 10;
       user.lastAdPackageUpdate = new Date();
       
-      // Update totalDeposits
+      // Update totalDeposits (track investment amount)
       if (typeof user.totalDeposits === 'undefined') {
         user.totalDeposits = 0;
       }
       user.totalDeposits += payment.amount;
       
-      // Add balance
-      user.balance = (user.balance || 0) + payment.amount;
+      // DO NOT add balance - user earns balance by watching ads only
       
       await payment.save();
       await user.save();
       
-      console.log(`✅ Package assigned successfully! (Same as Users Tab Assignment)`);
+      console.log(`✅ Package activated successfully!`);
       console.log(`   User: ${user.name} (${user.email})`);
       console.log(`   Plan: ${plan.name}`);
       console.log(`   Daily Ads Limit: ${user.maxDailyAds}`);
-      console.log(`   New Balance: $${user.balance.toFixed(2)}`);
+      console.log(`   Balance: $${user.balance.toFixed(2)} (unchanged - earnings from ads only)`);
       console.log(`   Total Deposits: $${user.totalDeposits.toFixed(2)}`);
     } else {
       // Custom plan without PaymentPlan reference
@@ -299,27 +298,26 @@ export const approvePayment = async (req, res, next) => {
       console.log(`   Amount: $${payment.amount}`);
       console.log(`   Calculated Ads: ${defaultAdsLimit} (formula: ${payment.amount}/100 * 3)`);
       
-      // Update user's package benefits - SAME AS assignPackage
+      // Update user's package benefits - activate plan only
       user.maxDailyAds = defaultAdsLimit;
       user.lastAdPackageUpdate = new Date();
       
-      // Update totalDeposits
+      // Update totalDeposits (track investment amount)
       if (typeof user.totalDeposits === 'undefined') {
         user.totalDeposits = 0;
       }
       user.totalDeposits += payment.amount;
       
-      // Add balance
-      user.balance = (user.balance || 0) + payment.amount;
+      // DO NOT add balance - user earns balance by watching ads only
       
       await payment.save();
       await user.save();
       
-      console.log(`✅ Custom package assigned successfully! (Same as Users Tab Assignment)`);
+      console.log(`✅ Custom package activated successfully!`);
       console.log(`   User: ${user.name} (${user.email})`);
       console.log(`   Amount: $${payment.amount}`);
       console.log(`   Daily Ads Limit: ${user.maxDailyAds}`);
-      console.log(`   New Balance: $${user.balance.toFixed(2)}`);
+      console.log(`   Balance: $${user.balance.toFixed(2)} (unchanged - earnings from ads only)`);
       console.log(`   Total Deposits: $${user.totalDeposits.toFixed(2)}`);
     }
     

@@ -24,13 +24,16 @@ const updateDemoBalance = async () => {
       process.exit(1);
     }
 
-    // Update balance to $100
-    demoUser.balance = 100.00;
+    // Update balance to $500 for testing
+    demoUser.balance = 500.00;
+    demoUser.totalEarnings = 500.00;
+    demoUser.totalDeposits = 500.00;
     await demoUser.save();
 
     console.log('✅ Demo user balance updated successfully!');
     console.log(`   Email: ${demoUser.email}`);
     console.log(`   New Balance: $${demoUser.balance.toFixed(2)}`);
+    console.log(`   Total Earnings: $${demoUser.totalEarnings.toFixed(2)}`);
     console.log(`   Name: ${demoUser.name}`);
     
     process.exit(0);
