@@ -156,21 +156,6 @@ const Login = () => {
         <div className="login-footer">
           <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
         </div>
-
-        {/* Demo Credentials Info */}
-        <div className="demo-credentials">
-          <h4>Demo Credentials:</h4>
-          <div className="demo-list">
-            <div className="demo-item">
-              <strong>Admin:</strong>
-              <span>admin@perbity.com / admin123456</span>
-            </div>
-            <div className="demo-item">
-              <strong>Demo User:</strong>
-              <span>demo@example.com / demo123</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
