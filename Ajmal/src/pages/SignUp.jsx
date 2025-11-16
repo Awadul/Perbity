@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { isValidEmail, isValidPassword, isRequired } from '../utils/validators';
 import { register } from '../services/auth';
@@ -9,12 +9,16 @@ import './SignUp.css';
 const SignUp = () => {
   const navigate = useNavigate();
   const { setUser } = useAppContext();
+  const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get('ref');
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    referralCode: referralCode || ''
   });
 
   const [errors, setErrors] = useState({});
@@ -90,7 +94,8 @@ const SignUp = () => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        password: formData.password
+        password: formData.password,
+        referralCode: formData.referralCode
       };
       
       const registeredUser = await register(userData);
@@ -180,6 +185,16 @@ const SignUp = () => {
               <span className="error-message">{errors.phone}</span>
             )}
           </div>
+
+          {referralCode && (
+            <div className="referral-info">
+              <div className="referral-icon">🎁</div>
+              <div className="referral-text">
+                <strong>You're invited!</strong>
+                <span>Join using referral code: <strong>{referralCode}</strong></span>
+              </div>
+            </div>
+          )}
 
           <div className="form-group">
             <label htmlFor="password">Password</label>

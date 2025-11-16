@@ -445,10 +445,10 @@ const Dashboard = () => {
           <div className="nav-icon">💰</div>
           <span>Buy</span>
         </button>
-        {/* <button className="nav-item" onClick={() => navigate('/invite')}>
+        <button className="nav-item" onClick={() => navigate('/invite')}>
           <div className="nav-icon">👥</div>
           <span>Invite</span>
-        </button> */}
+        </button>
         <button className="nav-item" onClick={() => navigate('/dashboard')}>
           <div className="nav-icon">📊</div>
           <span>Account</span>

@@ -35,11 +35,24 @@ export const register = async (req, res, next) => {
         await Referral.create({
           referrer: referrer._id,
           referred: user._id,
-          earning: 1.5
+          earning: 1.5,
+          status: 'confirmed'
         });
 
-        // Update referrer's referral count
+        // Add to team members
+        await referrer.addTeamMember(user._id);
         referrer.referralCount += 1;
+        
+        // Check if referrer reached 15 team members for $50 bonus
+        if (referrer.team.totalMembers === 15) {
+          referrer.balance += 50;
+          referrer.earnings.referrals += 50;
+          referrer.totalEarnings += 50;
+          referrer.referralEarningsTotal += 50;
+          
+          console.log(`🎉 User ${referrer.email} reached 15 referrals! $50 bonus added.`);
+        }
+        
         await referrer.save();
       }
     }

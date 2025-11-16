@@ -33,6 +33,7 @@ export const getReferralStats = async (req, res, next) => {
     const paidCount = referrals.filter(ref => ref.status === 'paid').length;
 
     const user = await User.findById(req.user.id);
+    const teamMembers = await User.find({ referredBy: req.user.id }).select('name email createdAt isActive balance totalEarnings');
 
     res.status(200).json({
       success: true,
@@ -42,7 +43,12 @@ export const getReferralStats = async (req, res, next) => {
         paidReferrals: paidCount,
         totalEarnings,
         referralCode: user.referralCode,
-        referralLink: `${process.env.CLIENT_URL}/signup?ref=${user.referralCode}`
+        referralLink: `${process.env.CLIENT_URL}/signup?ref=${user.referralCode}`,
+        teamMembers: teamMembers.length,
+        team: teamMembers,
+        bonusEligible: teamMembers.length >= 15,
+        progressToBonus: Math.min(teamMembers.length, 15),
+        bonusAmount: 50
       }
     });
   } catch (error) {

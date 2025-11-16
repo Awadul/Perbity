@@ -52,7 +52,205 @@
 }
 
 .header-spacer {
-  width: 32px;
+  width: 24px;
+}
+
+/* ========================================
+   BONUS PROGRESS CARD
+   ======================================== */
+
+.bonus-progress-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 18px;
+  margin: 16px 16px;
+  color: white;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+@media (max-width: 640px) {
+  .bonus-progress-card {
+    padding: 16px;
+    margin: 12px;
+  }
+}
+
+.bonus-header h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.bonus-header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 13px;
+}
+
+.progress-bar {
+  background: rgba(255, 255, 255, 0.2);
+  height: 6px;
+  border-radius: 3px;
+  margin: 12px 0 6px 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: white;
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.bonus-achieved {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  border-radius: 12px;
+  padding: 18px;
+  margin: 16px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+}
+
+.bonus-achieved .bonus-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.bonus-achieved h3 {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.bonus-achieved p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 13px;
+}
+
+/* ========================================
+   TEAM MEMBERS SECTION
+   ======================================== */
+
+.team-members-section {
+  margin: 16px;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 640px) {
+  .team-members-section {
+    margin: 12px;
+    padding: 14px;
+  }
+}
+
+.team-members-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.team-member-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.team-member-card:hover {
+  background: #e9ecef;
+  transform: translateX(2px);
+}
+
+@media (max-width: 640px) {
+  .team-member-card {
+    padding: 10px;
+  }
+}
+
+.member-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  margin-bottom: 3px;
+}
+
+.member-email {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-bottom: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-stats {
+  display: flex;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+}
+
+.active-badge {
+  background: #d4edda;
+  color: #155724;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.member-earnings {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--primary-600);
+  flex-shrink: 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-secondary);
 }
 
 /* ========================================
@@ -65,12 +263,19 @@
 }
 
 .invite-content {
-  max-width: 440px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 20px 16px;
+  padding: 16px 0;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .invite-content {
+    padding: 12px 0;
+    gap: 14px;
+  }
 }
 
 /* ========================================
@@ -79,30 +284,38 @@
 
 .invite-hero {
   text-align: center;
-  padding: 24px 16px;
+  padding: 16px;
   background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
-  border-radius: 16px;
+  border-radius: 12px;
+  margin: 0 16px;
+}
+
+@media (max-width: 640px) {
+  .invite-hero {
+    margin: 0 12px;
+    padding: 14px;
+  }
 }
 
 .hero-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+  font-size: 36px;
+  margin-bottom: 8px;
   animation: bounce 2.5s ease-in-out infinite;
 }
 
 .invite-hero h2 {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
   color: #1f2937;
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
   letter-spacing: -0.02em;
 }
 
 .invite-hero p {
-  font-size: 14px;
+  font-size: 13px;
   color: #6b7280;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 /* ========================================
@@ -111,28 +324,45 @@
 
 .referral-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  padding: 0 16px;
+  margin: 20px 0;
+}
+
+@media (max-width: 640px) {
+  .referral-stats {
+    grid-template-columns: 1fr;
+  }
 }
 
 .stat-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: white;
+  padding: 14px;
   border-radius: 12px;
-  padding: 14px 10px;
-  text-align: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
   transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .stat-icon {
   font-size: 24px;
-  margin-bottom: 6px;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .stat-info {
@@ -142,16 +372,18 @@
 }
 
 .stat-value {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
-  color: var(--color-primary);
-  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  line-height: 1.2;
 }
 
 .stat-label {
-  font-size: 11px;
-  color: #6b7280;
-  font-weight: 500;
+  font-size: 9px;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 600;
 }
 
 /* ========================================
@@ -186,6 +418,26 @@
    REFERRAL LINK SECTION
    ======================================== */
 
+.referral-link-section,
+.share-section,
+.how-it-works {
+  margin: 16px;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 640px) {
+  .referral-link-section,
+  .share-section,
+  .how-it-works {
+    margin: 12px;
+    padding: 14px;
+  }
+}
+
 .referral-link-section h3,
 .share-section h3,
 .how-it-works h3 {
@@ -198,20 +450,19 @@
 
 .referral-link-box {
   display: flex;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 6px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 5px;
   align-items: center;
-  gap: 8px;
-  border: 1.5px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: 6px;
+  border: 1px solid #e5e7eb;
 }
 
 .referral-input {
   flex: 1;
   border: none;
-  padding: 8px 10px;
-  font-size: 13px;
+  padding: 7px 10px;
+  font-size: 12px;
   background: transparent;
   outline: none;
   color: var(--color-text-primary);
@@ -221,9 +472,9 @@
   background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%);
   color: var(--color-text-inverse);
   border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 13px;
+  border-radius: 7px;
+  padding: 7px 14px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -251,15 +502,21 @@
   gap: 12px;
 }
 
+@media (max-width: 480px) {
+  .share-options {
+    grid-template-columns: 1fr;
+  }
+}
+
 .share-btn {
   background: #ffffff;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);

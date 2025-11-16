@@ -299,6 +299,39 @@
 }
 
 /* ========================================
+   REFERRAL INFO
+   ======================================== */
+
+.referral-info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.referral-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.referral-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.referral-text strong {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ========================================
    RESPONSIVE
    ======================================== */
 

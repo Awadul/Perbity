@@ -12,6 +12,7 @@ const router = express.Router();
 // User routes
 router.get('/', protect, getReferrals);
 router.get('/stats', protect, getReferralStats);
+router.get('/team', protect, getReferrals); // Alias for team members
 
 // Admin routes
 router.get('/admin/all', protect, authorize('admin'), getAllReferrals);
