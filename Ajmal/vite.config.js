@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.VITE_API_BASE_URL': JSON.stringify(
         mode === 'production' 
-          ? 'https://perbity.onrender.com'
+          ? 'https://perbity-apky.onrender.com'
           : env.VITE_API_BASE_URL || 'http://localhost:5001'
       )
     }
