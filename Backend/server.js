@@ -65,6 +65,24 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/checkouts', checkoutRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Root route
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Perbity API Server',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      users: '/api/users',
+      ads: '/api/ads',
+      payments: '/api/payments',
+      checkouts: '/api/checkouts',
+      admin: '/api/admin'
+    }
+  });
+});
+
 // Health check route
 app.get('/api/health', (req, res) => {
   res.status(200).json({
