@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: perbity-backend
+    runtime: node
+    rootDir: Backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5001
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: JWT_REFRESH_EXPIRE
+        value: 30d
+      - key: COOKIE_EXPIRE
+        value: 7
+      - key: CLIENT_URL
+        sync: false
