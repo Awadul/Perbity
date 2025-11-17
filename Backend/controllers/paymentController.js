@@ -35,7 +35,15 @@ export const submitPayment = async (req, res, next) => {
       return next(new ErrorResponse('Please upload payment proof image', 400));
     }
     
+    // Parse isUpgrade - handle both string and boolean
     const isUpgradeRequest = isUpgrade === 'true' || isUpgrade === true;
+    
+    console.log('📝 Payment submission details:');
+    console.log('   User ID:', req.user._id);
+    console.log('   Amount:', amount);
+    console.log('   isUpgrade (raw):', isUpgrade);
+    console.log('   isUpgradeRequest (parsed):', isUpgradeRequest);
+    console.log('   previousPaymentId:', previousPaymentId);
     
     // Handle both old format (paymentPlan) and new format (planId)
     let plan = null;
@@ -80,29 +88,44 @@ export const submitPayment = async (req, res, next) => {
       status: 'approved'
     });
     
+    console.log('   Active Payment Found:', activePayment ? 'Yes' : 'No');
+    if (activePayment) {
+      console.log('   Active Payment Amount:', activePayment.amount);
+      console.log('   Active Payment ID:', activePayment._id);
+    }
+    
     if (activePayment && !isUpgradeRequest) {
+      console.log('❌ Rejecting: User has active payment and this is not an upgrade');
       // Delete uploaded file
       fs.unlinkSync(req.file.path);
-      return next(new ErrorResponse('You already have an active payment plan', 400));
+      return next(new ErrorResponse('You already have an active payment plan. To upgrade, please use the upgrade option.', 400));
     }
     
     // For upgrades, verify the previous payment exists and is active
     if (isUpgradeRequest) {
+      console.log('🔄 Processing upgrade request...');
       if (!activePayment) {
+        console.log('❌ No active payment found for upgrade');
         fs.unlinkSync(req.file.path);
         return next(new ErrorResponse('No active package found to upgrade from', 400));
       }
       
+      console.log('✅ Active payment verified for upgrade');
+      
       if (previousPaymentId && activePayment._id.toString() !== previousPaymentId) {
+        console.log('❌ Previous payment ID mismatch');
         fs.unlinkSync(req.file.path);
         return next(new ErrorResponse('Previous payment ID does not match your active package', 400));
       }
       
       // Verify upgrade amount is higher than current
       if (parseFloat(amount) <= activePayment.amount) {
+        console.log('❌ Upgrade amount not higher than current');
         fs.unlinkSync(req.file.path);
         return next(new ErrorResponse('Upgrade amount must be higher than current package', 400));
       }
+      
+      console.log('✅ Upgrade validation passed');
     }
     
     // Check if user has a pending payment (including pending upgrades)

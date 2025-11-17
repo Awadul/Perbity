@@ -92,6 +92,13 @@ const PaymentInstructions = () => {
           ? `Package upgrade from $${currentPackage?.amount} to $${selectedPlan.amount} - New daily profit $${selectedPlan.dailyProfit}`
           : `Investment plan $${selectedPlan.amount} - Daily profit $${selectedPlan.dailyProfit}`);
 
+        // Debug logging
+        console.log('📤 Submitting payment with:');
+        console.log('   isUpgrade:', isUpgrade);
+        console.log('   amount:', selectedPlan.amount);
+        console.log('   previousPaymentId:', currentPackage?.paymentId);
+        console.log('   previousAmount:', currentPackage?.amount);
+
         const response = await apiService.upload('/payments/submit', formData);
 
         if (response.success) {
