@@ -191,6 +191,43 @@ export const updateProfile = async (req, res, next) => {
   }
 };
 
+// @desc    Change user password
+// @route   PUT /api/users/change-password
+// @access  Private
+export const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return next(new ErrorResponse('Please provide current and new password', 400));
+    }
+
+    if (newPassword.length < 6) {
+      return next(new ErrorResponse('New password must be at least 6 characters', 400));
+    }
+
+    // Get user with password field
+    const user = await User.findById(req.user.id).select('+password');
+
+    // Check current password
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return next(new ErrorResponse('Current password is incorrect', 401));
+    }
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password updated successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Get user stats
 // @route   GET /api/users/stats
 // @access  Private

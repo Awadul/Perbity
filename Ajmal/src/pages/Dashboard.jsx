@@ -11,6 +11,15 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [showPackageModal, setShowPackageModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('home');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
   
   const [userData, setUserData] = useState({
     name: 'Guest',
@@ -140,6 +149,58 @@ const Dashboard = () => {
   const handleLogout = async () => {
     await logout();
     navigate('/login', { replace: true });
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setPasswordError('');
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess(false);
+
+    // Validation
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      setPasswordError('All fields are required');
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters');
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+
+    try {
+      await apiService.put('/users/change-password', {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+
+      setPasswordSuccess(true);
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+
+      setTimeout(() => {
+        setShowPasswordModal(false);
+        setPasswordSuccess(false);
+      }, 2000);
+    } catch (error) {
+      setPasswordError(error.message || 'Failed to change password');
+    }
   };
 
   const handleViewAds = () => {
@@ -280,15 +341,17 @@ const Dashboard = () => {
       <main className="dashboard-main">
         <div className="dashboard-content">
           
-          {/* Welcome Card */}
-          <div className="welcome-card">
-            <h2>Welcome</h2>
-            <p className="username">{userData.name}</p>
-          </div>
+          {activeTab === 'home' && (
+            <>
+              {/* Welcome Card */}
+              <div className="welcome-card">
+                <h2>Welcome</h2>
+                <p className="username">{userData.name}</p>
+              </div>
 
-          {/* Active Package Card */}
-          {activePackage ? (
-            <div className="package-card" onClick={() => setShowPackageModal(true)}>
+              {/* Active Package Card */}
+              {activePackage ? (
+                <div className="package-card" onClick={() => setShowPackageModal(true)}>
               <div className="package-header">
                 <h3>💎 Investment Package</h3>
                 <span className="package-badge">{activePackage.name}</span>
@@ -318,122 +381,214 @@ const Dashboard = () => {
                 </div>
               </div>
               <p className="package-hint">👆 Tap for full details</p>
-            </div>
-          ) : (
-            <div className="no-package-card" onClick={() => window.location.href = '/buy-plan'}>
-              <div className="no-package-icon">📦</div>
-              <h3>No Active Package</h3>
-              <p>Purchase an investment package to start earning</p>
-              <button className="buy-package-btn">Browse Packages</button>
-            </div>
+                </div>
+              ) : (
+                <div className="no-package-card" onClick={() => window.location.href = '/buy-plan'}>
+                  <div className="no-package-icon">📦</div>
+                  <h3>No Active Package</h3>
+                  <p>Purchase an investment package to start earning</p>
+                  <button className="buy-package-btn">Browse Packages</button>
+                </div>
+              )}
+
+              {/* Balance Card */}
+              <div className="balance-card">
+                <h3>Account Balance</h3>
+                <div className="balance-amount">${userData.balance.toFixed(2)}</div>
+                <div className="balance-subinfo">
+                  <span>Today's Earnings: ${adsData.todayEarnings.toFixed(3)}</span>
+                </div>
+              </div>
+
+              {/* View Ads CTA */}
+              <div className="ads-cta-card">
+                <h3>Watch Ads & Earn</h3>
+                <p>Earn $1.00 per ad viewed</p>
+                <button 
+                  className={`ads-btn ${adsData.remaining === 0 ? 'disabled' : ''}`}
+                  onClick={handleViewAds}
+                  disabled={adsData.remaining === 0}
+                >
+                  {adsData.remaining > 0 
+                    ? `View Ads (${adsData.remaining} available)` 
+                    : 'Daily limit reached'}
+                </button>
+              </div>
+
+              {/* Team Reward Banner */}
+              {/* <div className="team-reward-banner">
+                <button className="reward-btn" onClick={() => navigate('/referrals')}>
+                  Team Reward
+                </button>
+                <div className="trophy-icon">🏆</div>
+              </div> */}
+
+              {/* Menu Grid */}
+              <div className="menu-grid">
+                <button className="menu-item" onClick={() => navigate('/buy-plan')}>
+                  <div className="menu-icon">💰</div>
+                  <span>Buy Plan</span>
+                </button>
+                <button className="menu-item" onClick={() => navigate('/cashout')}>
+                  <div className="menu-icon">💸</div>
+                  <span>Cashout</span>
+                </button>
+                <button 
+                  className="menu-item" 
+                  onClick={() => activePackage ? setShowPackageModal(true) : alert('No active package. Please purchase a plan first!')}
+                  title={activePackage ? 'View your active package details' : 'No active package'}
+                  style={!activePackage ? {opacity: 0.6} : {}}
+                >
+                  <div className="menu-icon">📋</div>
+                  <span>Active Plans</span>
+                </button>
+                <button className="menu-item" onClick={() => navigate('/history')}>
+                  <div className="menu-icon">📊</div>
+                  <span>History</span>
+                </button>
+                {/* <button className="menu-item" onClick={() => navigate('/referrals')}>
+                  <div className="menu-icon">👥</div>
+                  <span>Referrals</span>
+                </button> */}
+                {/* <button className="menu-item" onClick={() => navigate('/total-deposits')}>
+                  <div className="menu-icon">📈</div>
+                  <span>Total Deposits</span>
+                </button> */}
+              </div>
+            </>
           )}
 
-          {/* Balance Card */}
-          <div className="balance-card">
-            <h3>Account Balance</h3>
-            <div className="balance-amount">${userData.balance.toFixed(2)}</div>
-            <div className="balance-subinfo">
-              <span>Today's Earnings: ${adsData.todayEarnings.toFixed(3)}</span>
-            </div>
-          </div>
+          {activeTab === 'account' && (
+            <>
+              {/* Account Information */}
+              <div className="overview-section">
+                <h3 className="section-title">Account Information</h3>
+                <div className="account-info-card">
+                  <div className="account-info-item">
+                    <div className="info-icon">👤</div>
+                    <div className="info-content">
+                      <span className="info-label">Full Name</span>
+                      <span className="info-value">{userData.name}</span>
+                    </div>
+                  </div>
+                  <div className="account-info-item">
+                    <div className="info-icon">📧</div>
+                    <div className="info-content">
+                      <span className="info-label">Email Address</span>
+                      <span className="info-value">{userData.email}</span>
+                    </div>
+                  </div>
+                  <div className="account-info-item clickable" onClick={() => setShowPasswordModal(true)}>
+                    <div className="info-icon">🔒</div>
+                    <div className="info-content">
+                      <span className="info-label">Password</span>
+                      <span className="info-value">••••••••</span>
+                    </div>
+                    <div className="change-icon">✏️</div>
+                  </div>
+                </div>
+              </div>
 
-          {/* View Ads CTA */}
-          <div className="ads-cta-card">
-            <h3>Watch Ads & Earn</h3>
-            <p>Earn $1.00 per ad viewed</p>
-            <button 
-              className={`ads-btn ${adsData.remaining === 0 ? 'disabled' : ''}`}
-              onClick={handleViewAds}
-              disabled={adsData.remaining === 0}
-            >
-              {adsData.remaining > 0 
-                ? `View Ads (${adsData.remaining} available)` 
-                : 'Daily limit reached'}
-            </button>
-          </div>
-
-          {/* Team Reward Banner */}
-          {/* <div className="team-reward-banner">
-            <button className="reward-btn" onClick={() => navigate('/referrals')}>
-              Team Reward
-            </button>
-            <div className="trophy-icon">🏆</div>
-          </div> */}
-
-          {/* Menu Grid */}
-          <div className="menu-grid">
-            <button className="menu-item" onClick={() => navigate('/buy-plan')}>
-              <div className="menu-icon">💰</div>
-              <span>Buy Plan</span>
-            </button>
-            <button className="menu-item" onClick={() => navigate('/cashout')}>
-              <div className="menu-icon">💸</div>
-              <span>Cashout</span>
-            </button>
-            <button 
-              className="menu-item" 
-              onClick={() => activePackage ? setShowPackageModal(true) : alert('No active package. Please purchase a plan first!')}
-              title={activePackage ? 'View your active package details' : 'No active package'}
-              style={!activePackage ? {opacity: 0.6} : {}}
-            >
-              <div className="menu-icon">📋</div>
-              <span>Active Plans</span>
-            </button>
-            <button className="menu-item" onClick={() => navigate('/history')}>
-              <div className="menu-icon">📊</div>
-              <span>History</span>
-            </button>
-            {/* <button className="menu-item" onClick={() => navigate('/referrals')}>
-              <div className="menu-icon">👥</div>
-              <span>Referrals</span>
-            </button> */}
-            {/* <button className="menu-item" onClick={() => navigate('/total-deposits')}>
-              <div className="menu-icon">📈</div>
-              <span>Total Deposits</span>
-            </button> */}
-          </div>
-
-          {/* Account Overview */}
-          {/* <div className="overview-section">
-            <h3 className="section-title">Account Overview</h3>
-            <div className="overview-list">
-              <div className="overview-item">
-                <span>Total Deposits</span>
-                <span className="overview-value">${userData.totalDeposits.toFixed(2)}</span>
+              {/* Account Overview */}
+              <div className="overview-section">
+                <h3 className="section-title">Account Overview</h3>
+                <div className="overview-list">
+                  <div className="overview-item">
+                    <span>Total Deposits</span>
+                    <span className="overview-value">${userData.totalDeposits.toFixed(2)}</span>
+                  </div>
+                  <div className="overview-item">
+                    <span>Total Withdraws</span>
+                    <span className="overview-value">${userData.totalWithdraws.toFixed(2)}</span>
+                  </div>
+                  <div className="overview-item">
+                    <span>Referral Bonus</span>
+                    <span className="overview-value">${userData.referralBonus.toFixed(2)}</span>
+                  </div>
+                  <div className="overview-item">
+                    <span>Total Profit</span>
+                    <span className="overview-value">${userData.totalProfit.toFixed(2)}</span>
+                  </div>
+                  <div className="overview-item">
+                    <span>Pending Withdraws</span>
+                    <span className="overview-value">${userData.pendingWithdraws.toFixed(2)}</span>
+                  </div>
+                  <div className="overview-item">
+                    <span>Team Members</span>
+                    <span className="overview-value">{userData.teamMembers}</span>
+                  </div>
+                  <div className="overview-item">
+                    <span>Team Earnings</span>
+                    <span className="overview-value">${userData.teamDeposit.toFixed(2)}</span>
+                  </div>
+                </div>
               </div>
-              <div className="overview-item">
-                <span>Total Withdraws</span>
-                <span className="overview-value">${userData.totalWithdraws.toFixed(2)}</span>
-              </div>
-              <div className="overview-item">
-                <span>Referral Bonus</span>
-                <span className="overview-value">${userData.referralBonus.toFixed(2)}</span>
-              </div>
-              <div className="overview-item">
-                <span>Total Profit</span>
-                <span className="overview-value">${userData.totalProfit.toFixed(2)}</span>
-              </div>
-              <div className="overview-item">
-                <span>Pending Withdraws</span>
-                <span className="overview-value">${userData.pendingWithdraws.toFixed(2)}</span>
-              </div>
-              <div className="overview-item">
-                <span>Team Members</span>
-                <span className="overview-value">{userData.teamMembers}</span>
-              </div>
-              <div className="overview-item">
-                <span>Team Earnings</span>
-                <span className="overview-value">${userData.teamDeposit.toFixed(2)}</span>
-              </div>
-            </div>
-          </div> */}
+            </>
+          )}
 
         </div>
       </main>
 
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
+          <div className="modal-content password-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowPasswordModal(false)}>✕</button>
+            <h2>Change Password</h2>
+            
+            <form onSubmit={handlePasswordSubmit} className="password-form">
+              {passwordError && (
+                <div className="error-message-box">{passwordError}</div>
+              )}
+              {passwordSuccess && (
+                <div className="success-message-box">Password changed successfully!</div>
+              )}
+
+              <div className="form-group">
+                <label>Current Password</label>
+                <input
+                  type="password"
+                  name="currentPassword"
+                  value={passwordData.currentPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter current password"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>New Password</label>
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter new password (min 6 characters)"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Confirm New Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Confirm new password"
+                  required
+                />
+              </div>
+
+              <button type="submit" className="btn-primary">Change Password</button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Bottom Navigation */}
       <nav className="bottom-nav">
-        <button className="nav-item active" onClick={() => navigate('/dashboard')}>
+        <button className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>
           <div className="nav-icon">🏠</div>
           <span>Home</span>
         </button>
@@ -449,7 +604,7 @@ const Dashboard = () => {
           <div className="nav-icon">👥</div>
           <span>Invite</span>
         </button>
-        <button className="nav-item" onClick={() => navigate('/dashboard')}>
+        <button className={`nav-item ${activeTab === 'account' ? 'active' : ''}`} onClick={() => setActiveTab('account')}>
           <div className="nav-icon">📊</div>
           <span>Account</span>
         </button>

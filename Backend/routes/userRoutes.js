@@ -2,6 +2,7 @@ import express from 'express';
 import {
   getProfile,
   updateProfile,
+  changePassword,
   getUserStats,
   getUsers,
   getUser,
@@ -16,6 +17,7 @@ const router = express.Router();
 // User routes
 router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfileValidation, validate, updateProfile);
+router.put('/change-password', protect, changePassword);
 router.get('/stats', protect, getUserStats);
 
 // Admin routes
