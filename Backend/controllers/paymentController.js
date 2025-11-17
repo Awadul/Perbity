@@ -321,6 +321,20 @@ export const approvePayment = async (req, res, next) => {
       console.log(`   Total Deposits: $${user.totalDeposits.toFixed(2)}`);
     }
     
+    // Bonus for Referred User: Give $10 bonus when they buy a package
+    if (user.referredBy) {
+      // Give $10 bonus to the referred user (buyer)
+      user.balance += 10;
+      user.totalEarnings += 10;
+      
+      await user.save();
+      
+      console.log(`\n🎉 Referred User Bonus!`);
+      console.log(`   User: ${user.name} (${user.email})`);
+      console.log(`   Bonus Amount: $10`);
+      console.log(`   New Balance: $${user.balance.toFixed(2)}`);
+    }
+    
     // Referral Reward System: Give referrer $10 for every $100 package purchase
     if (user.referredBy) {
       const referrer = await User.findById(user.referredBy);

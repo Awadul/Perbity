@@ -490,7 +490,7 @@ const Dashboard = () => {
               </div>
 
               {/* Account Overview */}
-              <div className="overview-section">
+              {/* <div className="overview-section">
                 <h3 className="section-title">Account Overview</h3>
                 <div className="overview-list">
                   <div className="overview-item">
@@ -522,7 +522,7 @@ const Dashboard = () => {
                     <span className="overview-value">${userData.teamDeposit.toFixed(2)}</span>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </>
           )}
 
