@@ -14,6 +14,8 @@ const PaymentInstructions = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const selectedPlan = location.state?.plan;
+  const isUpgrade = location.state?.isUpgrade || false;
+  const currentPackage = location.state?.currentPackage || null;
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -81,12 +83,21 @@ const PaymentInstructions = () => {
         formData.append('amount', selectedPlan.amount);
         formData.append('accountName', accountName);
         formData.append('proofImage', proofImage);
-        formData.append('note', `Investment plan $${selectedPlan.amount} - Daily profit $${selectedPlan.dailyProfit}`);
+        formData.append('isUpgrade', isUpgrade);
+        if (isUpgrade && currentPackage) {
+          formData.append('previousPaymentId', currentPackage.paymentId);
+          formData.append('previousAmount', currentPackage.amount);
+        }
+        formData.append('note', isUpgrade 
+          ? `Package upgrade from $${currentPackage?.amount} to $${selectedPlan.amount} - New daily profit $${selectedPlan.dailyProfit}`
+          : `Investment plan $${selectedPlan.amount} - Daily profit $${selectedPlan.dailyProfit}`);
 
         const response = await apiService.upload('/payments/submit', formData);
 
         if (response.success) {
-          alert('Payment submitted successfully! Your plan will be activated once admin approves your payment.');
+          alert(isUpgrade 
+            ? 'Upgrade request submitted successfully! Your package will be upgraded once admin approves your payment.'
+            : 'Payment submitted successfully! Your plan will be activated once admin approves your payment.');
           navigate('/dashboard');
         }
       } catch (error) {
@@ -111,10 +122,36 @@ const PaymentInstructions = () => {
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
         </button>
-        <h1>Payment Instructions</h1>
+        <h1>{isUpgrade ? 'Package Upgrade Instructions' : 'Payment Instructions'}</h1>
       </header>
 
       <div className="payment-content">
+        {/* Current Package Info (for upgrades) */}
+        {isUpgrade && currentPackage && (
+          <div className="upgrade-info-card">
+            <h2>🔄 Upgrade Details</h2>
+            <div className="upgrade-comparison">
+              <div className="package-column current">
+                <h3>Current Package</h3>
+                <div className="package-amount">${currentPackage.amount}</div>
+                <div className="package-profit">Daily: ${currentPackage.dailyProfit.toFixed(2)}</div>
+              </div>
+              <div className="arrow-column">
+                <div className="upgrade-arrow">→</div>
+              </div>
+              <div className="package-column new">
+                <h3>New Package</h3>
+                <div className="package-amount highlight">${selectedPlan.amount}</div>
+                <div className="package-profit">Daily: ${selectedPlan.dailyProfit.toFixed(2)}</div>
+              </div>
+            </div>
+            <div className="additional-payment">
+              <span>Additional Payment Required:</span>
+              <strong className="additional-amount">${selectedPlan.amount - currentPackage.amount}</strong>
+            </div>
+          </div>
+        )}
+
         {/* Plan Summary */}
         <div className="plan-summary-card">
           <h2>📦 Selected Plan</h2>

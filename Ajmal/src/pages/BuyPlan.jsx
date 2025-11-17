@@ -32,11 +32,14 @@ const BuyPlan = () => {
     }
   };
 
+  const hasActivePackage = userProfile?.activePayment?.isActive;
+  const currentPackageAmount = userProfile?.activePayment?.plan?.price || 0;
+
   const content = {
     en: {
-      title: 'Buy Investment Plan',
-      subtitle: 'Choose your investment amount and start earning daily profits',
-      planHeader: 'Investment Plans',
+      title: hasActivePackage ? 'Upgrade Investment Plan' : 'Buy Investment Plan',
+      subtitle: hasActivePackage ? 'Upgrade to a higher investment plan and increase your daily profits' : 'Choose your investment amount and start earning daily profits',
+      planHeader: hasActivePackage ? 'Available Upgrades' : 'Investment Plans',
       amount: 'Amount (USD)',
       dailyProfit: 'Daily Profit (USD)',
       dailyReturn: '% Daily Return',
@@ -61,7 +64,11 @@ const BuyPlan = () => {
       step4Desc: 'Withdraw your earnings anytime through the Cashout page',
       continueBtn: 'Continue to Payment',
       cancelBtn: 'Cancel',
-      modalTitle: 'Confirm Investment Plan',
+      currentPackage: 'Current Package',
+      upgradeFrom: 'Upgrading From',
+      upgradeTo: 'Upgrading To',
+      additionalInvestment: 'Additional Investment',
+      modalTitle: hasActivePackage ? 'Confirm Package Upgrade' : 'Confirm Investment Plan',
       modalAmount: 'Investment Amount',
       modalDaily: 'Daily Profit',
       modalReturn: 'Daily Return Rate',
@@ -70,9 +77,9 @@ const BuyPlan = () => {
       modalTotal: 'Total Investment Value'
     },
     ur: {
-      title: 'سرمایہ کاری پلان خریدیں',
-      subtitle: 'اپنی سرمایہ کاری کی رقم منتخب کریں اور روزانہ منافع کمانا شروع کریں',
-      planHeader: 'سرمایہ کاری پلانز',
+      title: hasActivePackage ? 'سرمایہ کاری پلان اپ گریڈ کریں' : 'سرمایہ کاری پلان خریدیں',
+      subtitle: hasActivePackage ? 'اعلیٰ سرمایہ کاری پلان میں اپ گریڈ کریں اور اپنا روزانہ منافع بڑھائیں' : 'اپنی سرمایہ کاری کی رقم منتخب کریں اور روزانہ منافع کمانا شروع کریں',
+      planHeader: hasActivePackage ? 'دستیاب اپ گریڈز' : 'سرمایہ کاری پلانز',
       amount: 'رقم (USD)',
       dailyProfit: 'روزانہ منافع (USD)',
       dailyReturn: '% روزانہ واپسی',
@@ -108,7 +115,7 @@ const BuyPlan = () => {
   };
 
   // Investment plans data from the image
-  const investmentPlans = [
+  const allPlans = [
     { amount: 100, dailyProfit: 3, dailyReturn: 3 },
     { amount: 200, dailyProfit: 6, dailyReturn: 3 },
     { amount: 300, dailyProfit: 9, dailyReturn: 3 },
@@ -121,6 +128,11 @@ const BuyPlan = () => {
     { amount: 1000, dailyProfit: 30, dailyReturn: 3 }
   ];
 
+  // Filter plans - only show higher amounts if user has active package
+  const investmentPlans = hasActivePackage 
+    ? allPlans.filter(plan => plan.amount > currentPackageAmount)
+    : allPlans;
+
   const calculateBonus = (amount) => {
     return (amount / 100) * 10;
   };
@@ -132,7 +144,16 @@ const BuyPlan = () => {
 
   const handleContinueToPayment = () => {
     // Navigate to payment instructions page with selected plan details
-    navigate('/payment-instructions', { state: { plan: selectedPlan } });
+    const paymentData = {
+      plan: selectedPlan,
+      isUpgrade: hasActivePackage,
+      currentPackage: hasActivePackage ? {
+        amount: currentPackageAmount,
+        dailyProfit: userProfile.activePayment.plan.dailyProfit || (currentPackageAmount * 0.03),
+        paymentId: userProfile.activePayment._id
+      } : null
+    };
+    navigate('/payment-instructions', { state: paymentData });
   };
 
   if (loading) {
@@ -196,38 +217,69 @@ const BuyPlan = () => {
           </div>
         </div>
 
+        {/* Current Package Info (for upgrades) */}
+        {hasActivePackage && (
+          <div className="current-package-section">
+            <h3>📦 Current Active Package</h3>
+            <div className="current-package-card">
+              <div className="package-row">
+                <span>Investment Amount:</span>
+                <strong>${currentPackageAmount}</strong>
+              </div>
+              <div className="package-row">
+                <span>Daily Profit:</span>
+                <strong className="highlight">${(userProfile.activePayment.plan.dailyProfit || (currentPackageAmount * 0.03)).toFixed(2)}</strong>
+              </div>
+              <div className="package-row">
+                <span>Status:</span>
+                <span className="status-badge active">Active</span>
+              </div>
+            </div>
+            <p className="upgrade-note">💡 Select a higher investment plan below to upgrade</p>
+          </div>
+        )}
+
         {/* Investment Plans Table */}
         <div className="plans-section">
           <h2>{t.planHeader}</h2>
-          <div className="plans-table-container">
-            <table className="plans-table">
-              <thead>
-                <tr>
-                  <th>{t.amount}</th>
-                  <th>{t.dailyProfit}</th>
-                  <th>{t.dailyReturn}</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {investmentPlans.map((plan, index) => (
-                  <tr key={index} className={selectedPlan?.amount === plan.amount ? 'selected-row' : ''}>
-                    <td>${plan.amount}</td>
-                    <td>${plan.dailyProfit}</td>
-                    <td>{plan.dailyReturn}%</td>
-                    <td>
-                      <button
-                        className={`select-plan-btn ${selectedPlan?.amount === plan.amount ? 'selected' : ''}`}
-                        onClick={() => handleSelectPlan(plan)}
-                      >
-                        {selectedPlan?.amount === plan.amount ? t.selectedBtn : t.selectBtn}
-                      </button>
-                    </td>
+          {hasActivePackage && investmentPlans.length === 0 && (
+            <div className="no-upgrades-message">
+              <div className="no-upgrades-icon">🎉</div>
+              <h3>You're on the Maximum Plan!</h3>
+              <p>You're already on the highest investment package available.</p>
+            </div>
+          )}
+          {investmentPlans.length > 0 && (
+            <div className="plans-table-container">
+              <table className="plans-table">
+                <thead>
+                  <tr>
+                    <th>{t.amount}</th>
+                    <th>{t.dailyProfit}</th>
+                    <th>{t.dailyReturn}</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {investmentPlans.map((plan, index) => (
+                    <tr key={index} className={selectedPlan?.amount === plan.amount ? 'selected-row' : ''}>
+                      <td>${plan.amount}</td>
+                      <td>${plan.dailyProfit}</td>
+                      <td>{plan.dailyReturn}%</td>
+                      <td>
+                        <button
+                          className={`select-plan-btn ${selectedPlan?.amount === plan.amount ? 'selected' : ''}`}
+                          onClick={() => handleSelectPlan(plan)}
+                        >
+                          {selectedPlan?.amount === plan.amount ? t.selectedBtn : t.selectBtn}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Features Section */}
@@ -291,8 +343,25 @@ const BuyPlan = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>{t.modalTitle}</h2>
             <div className="modal-details">
+              {hasActivePackage && (
+                <>
+                  <div className="modal-row upgrade-from">
+                    <span className="modal-label">Current Package:</span>
+                    <span className="modal-value">${currentPackageAmount}</span>
+                  </div>
+                  <div className="modal-row upgrade-to">
+                    <span className="modal-label">New Package:</span>
+                    <span className="modal-value highlight">${selectedPlan.amount}</span>
+                  </div>
+                  <div className="modal-row additional-investment">
+                    <span className="modal-label">Additional Investment:</span>
+                    <span className="modal-value additional">${selectedPlan.amount - currentPackageAmount}</span>
+                  </div>
+                  <div className="modal-divider"></div>
+                </>
+              )}
               <div className="modal-row">
-                <span className="modal-label">{t.modalAmount}:</span>
+                <span className="modal-label">{hasActivePackage ? 'New Package Amount' : t.modalAmount}:</span>
                 <span className="modal-value">${selectedPlan.amount}</span>
               </div>
               <div className="modal-row">

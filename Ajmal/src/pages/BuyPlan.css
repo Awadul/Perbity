@@ -702,3 +702,135 @@
     font-size: 20px;
   }
 }
+
+/* Current Package Section (Upgrade Mode) */
+.current-package-section {
+  margin: 25px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.current-package-section h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 15px;
+}
+
+.current-package-card {
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.current-package-card .package-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 15px;
+  color: #334155;
+}
+
+.current-package-card .package-row:last-child {
+  margin-bottom: 0;
+}
+
+.current-package-card .package-row span {
+  font-weight: 500;
+}
+
+.current-package-card .package-row strong {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.current-package-card .package-row .highlight {
+  color: #3b82f6;
+  font-weight: 700;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #10b981;
+  color: white;
+}
+
+.upgrade-note {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.no-upgrades-message {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  margin-top: 20px;
+}
+
+.no-upgrades-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.no-upgrades-message h3 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.no-upgrades-message p {
+  font-size: 16px;
+  color: #64748b;
+}
+
+/* Modal Upgrade Styles */
+.modal-row.upgrade-from,
+.modal-row.upgrade-to,
+.modal-row.additional-investment {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.modal-row.upgrade-from {
+  background: #fee2e2;
+}
+
+.modal-row.upgrade-to {
+  background: #dcfce7;
+}
+
+.modal-row.additional-investment {
+  background: #fef3c7;
+  font-weight: 600;
+}
+
+.modal-row .additional {
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.modal-divider {
+  height: 2px;
+  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+  margin: 16px 0;
+}

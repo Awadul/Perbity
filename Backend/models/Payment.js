@@ -74,6 +74,19 @@ const paymentSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: false
+  },
+  isUpgrade: {
+    type: Boolean,
+    default: false
+  },
+  previousPayment: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Payment',
+    default: null
+  },
+  previousAmount: {
+    type: Number,
+    default: null
   }
 }, {
   timestamps: true

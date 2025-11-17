@@ -708,13 +708,25 @@ const AdminDashboard = () => {
               </thead>
               <tbody>
                 {payments.map(payment => (
-                  <tr key={payment._id}>
+                  <tr key={payment._id} className={payment.isUpgrade ? 'upgrade-row' : ''}>
                     <td>
                       <div>{payment.user?.name}</div>
                       <small style={{color: '#666'}}>{payment.user?.email}</small>
                     </td>
                     <td>
                       <div>
+                        {payment.isUpgrade && (
+                          <div style={{marginBottom: '8px', padding: '4px 8px', background: '#fff3cd', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', color: '#856404'}}>
+                            🔄 UPGRADE REQUEST
+                          </div>
+                        )}
+                        {payment.isUpgrade && payment.previousAmount && (
+                          <div style={{marginBottom: '6px'}}>
+                            <small style={{color: '#666'}}>
+                              <strong>From:</strong> ${payment.previousAmount} → <strong>To:</strong> ${payment.amount}
+                            </small>
+                          </div>
+                        )}
                         {payment.paymentPlan ? (
                           <>
                             <div><strong>{payment.paymentPlan.name}</strong></div>

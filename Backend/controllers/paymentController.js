@@ -28,12 +28,14 @@ export const getPaymentPlans = async (req, res, next) => {
 // @access  Private
 export const submitPayment = async (req, res, next) => {
   try {
-    const { paymentPlan, planId, amount, paymentMethod, transactionId, accountName, note } = req.body;
+    const { paymentPlan, planId, amount, paymentMethod, transactionId, accountName, note, isUpgrade, previousPaymentId, previousAmount } = req.body;
     
     // Check if file was uploaded
     if (!req.file) {
       return next(new ErrorResponse('Please upload payment proof image', 400));
     }
+    
+    const isUpgradeRequest = isUpgrade === 'true' || isUpgrade === true;
     
     // Handle both old format (paymentPlan) and new format (planId)
     let plan = null;
@@ -78,13 +80,32 @@ export const submitPayment = async (req, res, next) => {
       status: 'approved'
     });
     
-    if (activePayment) {
+    if (activePayment && !isUpgradeRequest) {
       // Delete uploaded file
       fs.unlinkSync(req.file.path);
       return next(new ErrorResponse('You already have an active payment plan', 400));
     }
     
-    // Check if user has a pending payment
+    // For upgrades, verify the previous payment exists and is active
+    if (isUpgradeRequest) {
+      if (!activePayment) {
+        fs.unlinkSync(req.file.path);
+        return next(new ErrorResponse('No active package found to upgrade from', 400));
+      }
+      
+      if (previousPaymentId && activePayment._id.toString() !== previousPaymentId) {
+        fs.unlinkSync(req.file.path);
+        return next(new ErrorResponse('Previous payment ID does not match your active package', 400));
+      }
+      
+      // Verify upgrade amount is higher than current
+      if (parseFloat(amount) <= activePayment.amount) {
+        fs.unlinkSync(req.file.path);
+        return next(new ErrorResponse('Upgrade amount must be higher than current package', 400));
+      }
+    }
+    
+    // Check if user has a pending payment (including pending upgrades)
     const pendingPayment = await Payment.findOne({
       user: req.user._id,
       status: 'pending'
@@ -104,8 +125,15 @@ export const submitPayment = async (req, res, next) => {
       proofImage: req.file.path,
       transactionId: transactionId || null,
       accountName: accountName || null,
-      adminNotes: note || null
+      adminNotes: note || null,
+      isUpgrade: isUpgradeRequest
     };
+    
+    // Add upgrade-specific fields
+    if (isUpgradeRequest && activePayment) {
+      paymentData.previousPayment = activePayment._id;
+      paymentData.previousAmount = activePayment.amount;
+    }
     
     // Only add paymentPlan if we have a valid plan
     if (plan) {
@@ -118,6 +146,11 @@ export const submitPayment = async (req, res, next) => {
     // Populate plan details if exists
     if (payment.paymentPlan) {
       await payment.populate('paymentPlan');
+    }
+    
+    // Populate previous payment for upgrades
+    if (payment.isUpgrade && payment.previousPayment) {
+      await payment.populate('previousPayment');
     }
     
     res.status(201).json({
@@ -234,6 +267,7 @@ export const approvePayment = async (req, res, next) => {
     console.log(`👤 User ID: ${payment.user}`);
     console.log(`📦 Payment Plan ID: ${payment.paymentPlan || 'None (Custom Plan)'}`);
     console.log(`💵 Amount: $${payment.amount}`);
+    console.log(`🔄 Is Upgrade: ${payment.isUpgrade ? 'Yes' : 'No'}`);
     
     // Get user
     const user = await User.findById(payment.user);
@@ -243,9 +277,20 @@ export const approvePayment = async (req, res, next) => {
       return next(new ErrorResponse('User not found', 404));
     }
     
-    // Deactivate any other active payments for this user (same as assignPackage)
+    // For upgrades, deactivate the previous payment
+    if (payment.isUpgrade && payment.previousPayment) {
+      const previousPayment = await Payment.findById(payment.previousPayment);
+      if (previousPayment) {
+        previousPayment.isActive = false;
+        previousPayment.status = 'expired';
+        await previousPayment.save();
+        console.log(`🔄 Deactivated previous package: $${previousPayment.amount}`);
+      }
+    }
+    
+    // Deactivate any other active payments for this user
     await Payment.updateMany(
-      { user: payment.user, isActive: true },
+      { user: payment.user, isActive: true, _id: { $ne: payment._id } },
       { isActive: false, status: 'expired' }
     );
     

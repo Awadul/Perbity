@@ -218,6 +218,15 @@ tbody tr:hover {
   background: #f8fafc;
 }
 
+tbody tr.upgrade-row {
+  background: linear-gradient(135deg, #fef3c7 0%, #fef9e6 100%);
+  border-left: 4px solid #f59e0b;
+}
+
+tbody tr.upgrade-row:hover {
+  background: linear-gradient(135deg, #fde68a 0%, #fef3c7 100%);
+}
+
 .status-badge {
   display: inline-block;
   padding: 4px 12px;
