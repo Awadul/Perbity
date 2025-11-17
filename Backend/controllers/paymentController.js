@@ -335,31 +335,6 @@ export const approvePayment = async (req, res, next) => {
       console.log(`   New Balance: $${user.balance.toFixed(2)}`);
     }
     
-    // Referral Reward System: Give referrer $10 for every $100 package purchase
-    if (user.referredBy) {
-      const referrer = await User.findById(user.referredBy);
-      if (referrer) {
-        // Calculate referral reward: $10 for every $100
-        const referralReward = Math.floor(payment.amount / 100) * 10;
-        
-        if (referralReward > 0) {
-          referrer.balance += referralReward;
-          referrer.earnings.referrals += referralReward;
-          referrer.totalEarnings += referralReward;
-          referrer.referralEarningsTotal += referralReward;
-          
-          await referrer.save();
-          
-          console.log(`\n🎁 Referral Reward Given!`);
-          console.log(`   Referred User: ${user.name} (${user.email})`);
-          console.log(`   Package Amount: $${payment.amount}`);
-          console.log(`   Referrer: ${referrer.name} (${referrer.email})`);
-          console.log(`   Reward Amount: $${referralReward}`);
-          console.log(`   Referrer New Balance: $${referrer.balance.toFixed(2)}`);
-        }
-      }
-    }
-    
     // Populate details
     await payment.populate('user', 'name email');
     

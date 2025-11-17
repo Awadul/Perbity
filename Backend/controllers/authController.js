@@ -43,15 +43,29 @@ export const register = async (req, res, next) => {
         await referrer.addTeamMember(user._id);
         referrer.referralCount += 1;
         
-        // Check if referrer reached 15 team members for $50 bonus
-        if (referrer.team.totalMembers === 15) {
-          referrer.balance += 50;
-          referrer.earnings.referrals += 50;
-          referrer.totalEarnings += 50;
-          referrer.referralEarningsTotal += 50;
-          
-          console.log(`🎉 User ${referrer.email} reached 15 referrals! $50 bonus added.`);
+        // Give $5 bonus for new team member registration
+        referrer.balance = (referrer.balance || 0) + 5;
+        
+        // Ensure earnings object exists
+        if (!referrer.earnings) {
+          referrer.earnings = {
+            ads: 0,
+            referrals: 0,
+            emails: 0,
+            reviews: 0,
+            investments: 0
+          };
         }
+        
+        referrer.earnings.referrals = (referrer.earnings.referrals || 0) + 5;
+        referrer.totalEarnings = (referrer.totalEarnings || 0) + 5;
+        referrer.referralEarningsTotal = (referrer.referralEarningsTotal || 0) + 5;
+        
+        console.log(`\n💰 New Member Registration Bonus!`);
+        console.log(`   New Member: ${user.name} (${user.email})`);
+        console.log(`   Referrer: ${referrer.name} (${referrer.email})`);
+        console.log(`   Bonus: $5`);
+        console.log(`   Referrer New Balance: $${referrer.balance.toFixed(2)}`);
         
         await referrer.save();
       }
