@@ -10,14 +10,27 @@ const BuyPlan = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
       navigate('/login');
       return;
     }
-    setLoading(false);
+    fetchUserProfile();
   }, [isAuthenticated, user, navigate]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const apiService = (await import('../services/api')).default;
+      const response = await apiService.get('/users/profile');
+      setUserProfile(response.data);
+    } catch (error) {
+      console.error('Failed to fetch user profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const content = {
     en: {
@@ -53,6 +66,7 @@ const BuyPlan = () => {
       modalDaily: 'Daily Profit',
       modalReturn: 'Daily Return Rate',
       modalBonus: 'Sign-up Bonus',
+      modalReferredBonus: 'Buyer Bonus (Referred)',
       modalTotal: 'Total Investment Value'
     },
     ur: {
@@ -88,6 +102,7 @@ const BuyPlan = () => {
       modalDaily: 'روزانہ منافع',
       modalReturn: 'روزانہ واپسی کی شرح',
       modalBonus: 'سائن اپ بونس',
+      modalReferredBonus: 'خریدار بونس (حوالہ)',
       modalTotal: 'کل سرمایہ کاری کی قیمت'
     }
   };
@@ -148,12 +163,36 @@ const BuyPlan = () => {
       <div className="buy-plan-content">
         <p className="subtitle">{t.subtitle}</p>
 
-        {/* Bonus Banner */}
-        <div className="bonus-banner">
-          <span className="bonus-icon">🎁</span>
-          <div className="bonus-text">
-            <strong>{t.bonus}</strong>
-            <p>{t.bonusText}</p>
+        {/* Bonus Information Banner */}
+        <div className="bonus-info-section">
+          <div className="bonus-header">
+            <span className="bonus-icon">🎁</span>
+            <h3>Earn Bonus Rewards!</h3>
+          </div>
+          
+          <div className="bonus-cards">
+            <div className="bonus-card">
+              <div className="bonus-card-icon">💰</div>
+              <div className="bonus-card-content">
+                <h4>Your Purchase Bonus</h4>
+                <p className="bonus-amount">$10 Instant Credit</p>
+                <span className="bonus-desc">Get $10 added to your balance when you buy any package</span>
+              </div>
+            </div>
+            
+            <div className="bonus-card">
+              <div className="bonus-card-icon">👥</div>
+              <div className="bonus-card-content">
+                <h4>Invite Friends</h4>
+                <p className="bonus-amount">$5 Per Referral</p>
+                <span className="bonus-desc">Earn $5 when someone signs up using your referral link</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bonus-note">
+            <span className="note-icon">ℹ️</span>
+            <p>All bonuses are added instantly to your account balance and can be withdrawn anytime!</p>
           </div>
         </div>
 
@@ -264,13 +303,15 @@ const BuyPlan = () => {
                 <span className="modal-label">{t.modalReturn}:</span>
                 <span className="modal-value">{selectedPlan.dailyReturn}%</span>
               </div>
-              <div className="modal-row bonus-row">
-                <span className="modal-label">{t.modalBonus}:</span>
-                <span className="modal-value bonus">${calculateBonus(selectedPlan.amount)}</span>
-              </div>
+              {userProfile?.referredBy && (
+                <div className="modal-row bonus-row">
+                  <span className="modal-label">{t.modalReferredBonus}:</span>
+                  <span className="modal-value bonus">$10</span>
+                </div>
+              )}
               <div className="modal-row total-row">
                 <span className="modal-label">{t.modalTotal}:</span>
-                <span className="modal-value total">${selectedPlan.amount + calculateBonus(selectedPlan.amount)}</span>
+                <span className="modal-value total">${userProfile?.referredBy ? selectedPlan.amount + 10 : selectedPlan.amount}</span>
               </div>
             </div>
             <div className="modal-actions">

@@ -82,39 +82,111 @@
   line-height: 1.5;
 }
 
-/* Bonus Banner */
-.bonus-banner {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 1px solid #fbbf24;
-  border-radius: 12px;
-  padding: 15px;
+/* Bonus Information Section */
+.bonus-info-section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.bonus-header {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 25px;
-  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.15);
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.bonus-icon {
+.bonus-header .bonus-icon {
   font-size: 32px;
-  flex-shrink: 0;
 }
 
-.bonus-text {
+.bonus-header h3 {
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.bonus-cards {
+  display: grid;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.bonus-card {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #fbbf24;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  transition: all 0.3s ease;
+}
+
+.bonus-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(251, 191, 36, 0.25);
+  border-color: #f59e0b;
+}
+
+.bonus-card-icon {
+  font-size: 36px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.bonus-card-content {
   flex: 1;
 }
 
-.bonus-text strong {
+.bonus-card-content h4 {
   color: #78350f;
-  font-size: 16px;
-  display: block;
-  margin-bottom: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
 }
 
-.bonus-text p {
+.bonus-card-content .bonus-amount {
+  color: #b45309;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  display: block;
+}
+
+.bonus-card-content .bonus-desc {
   color: #92400e;
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 1.5;
+  display: block;
+}
+
+.bonus-note {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 1px solid #60a5fa;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.bonus-note .note-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.bonus-note p {
+  color: #1e3a8a;
+  font-size: 12px;
+  line-height: 1.5;
   margin: 0;
+  font-weight: 500;
 }
 
 /* Plans Section */
@@ -533,12 +605,41 @@
     font-size: 16px;
   }
 
-  .bonus-banner {
+  .bonus-info-section {
+    padding: 25px;
+  }
+
+  .bonus-header h3 {
+    font-size: 20px;
+  }
+
+  .bonus-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .bonus-card {
     padding: 20px;
   }
 
-  .bonus-text strong {
-    font-size: 18px;
+  .bonus-card-content h4 {
+    font-size: 16px;
+  }
+
+  .bonus-card-content .bonus-amount {
+    font-size: 22px;
+  }
+
+  .bonus-card-content .bonus-desc {
+    font-size: 13px;
+  }
+
+  .bonus-note {
+    padding: 15px;
+  }
+
+  .bonus-note p {
+    font-size: 13px;
   }
 
   .plans-section,
