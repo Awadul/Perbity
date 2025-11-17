@@ -184,8 +184,8 @@ const BuyPlan = () => {
               <div className="bonus-card-icon">👥</div>
               <div className="bonus-card-content">
                 <h4>Invite Friends</h4>
-                <p className="bonus-amount">$5 Per Referral</p>
-                <span className="bonus-desc">Earn $5 when someone signs up using your referral link</span>
+                <p className="bonus-amount">$20 Per Referral</p>
+                <span className="bonus-desc">Earn $20 when someone signs up using your referral link</span>
               </div>
             </div>
           </div>
