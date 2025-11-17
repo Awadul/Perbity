@@ -116,9 +116,30 @@ const SignUp = () => {
       });
     } catch (error) {
       console.error('Sign up error:', error);
-      setErrors({ 
-        general: error.message || 'Registration failed. Please try again.' 
-      });
+      
+      // Extract error message from response
+      let errorMessage = 'Registration failed. Please try again.';
+      
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('HTTP error')) {
+        errorMessage = error.message;
+      }
+      
+      // Provide user-friendly error messages
+      if (errorMessage.includes('already exists') || errorMessage.includes('already registered')) {
+        errorMessage = 'An account with this email already exists. Please login or use a different email.';
+      } else if (errorMessage.includes('Invalid referral code')) {
+        errorMessage = 'The referral code you entered is invalid. Please check and try again.';
+      } else if (errorMessage.includes('validation failed') || errorMessage.includes('required')) {
+        errorMessage = 'Please fill in all required fields correctly.';
+      } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      }
+      
+      setErrors({ general: errorMessage });
     } finally {
       setIsSubmitting(false);
     }

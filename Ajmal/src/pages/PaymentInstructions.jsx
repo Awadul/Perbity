@@ -13,6 +13,8 @@ const PaymentInstructions = () => {
   const [proofPreview, setProofPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorModalMessage, setErrorModalMessage] = useState('');
   const selectedPlan = location.state?.plan;
   const isUpgrade = location.state?.isUpgrade || false;
   const currentPackage = location.state?.currentPackage || null;
@@ -109,7 +111,30 @@ const PaymentInstructions = () => {
         }
       } catch (error) {
         console.error('Payment submission failed:', error);
-        alert(error.message || 'Failed to submit payment. Please try again.');
+        
+        // Extract error message from response
+        let errorMessage = 'Failed to submit payment. Please try again.';
+        
+        if (error.response?.data?.error) {
+          errorMessage = error.response.data.error;
+        } else if (error.message && !error.message.includes('HTTP error')) {
+          errorMessage = error.message;
+        }
+        
+        // Provide user-friendly error messages
+        if (errorMessage.includes('pending payment')) {
+          errorMessage = 'You already have a pending payment request waiting for admin approval. Please wait for it to be processed before submitting a new request.';
+        } else if (errorMessage.includes('active payment plan') && !isUpgrade) {
+          errorMessage = 'You already have an active package. If you want to upgrade, please go back and select the upgrade option.';
+        } else if (errorMessage.includes('No active package')) {
+          errorMessage = 'No active package found. Please purchase a package first before upgrading.';
+        } else if (errorMessage.includes('must be higher')) {
+          errorMessage = 'Upgrade amount must be higher than your current package amount.';
+        }
+        
+        // Show error modal instead of alert
+        setErrorModalMessage(errorMessage);
+        setShowErrorModal(true);
       } finally {
         setLoading(false);
       }
@@ -280,6 +305,23 @@ const PaymentInstructions = () => {
           </ul>
         </div>
       </div>
+
+      {/* Error Modal */}
+      {showErrorModal && (
+        <div className="modal-overlay" onClick={() => setShowErrorModal(false)}>
+          <div className="modal-content error-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="error-modal-icon">⚠️</div>
+            <h2>Unable to Submit Payment</h2>
+            <p className="error-modal-message">{errorModalMessage}</p>
+            <button 
+              className="error-modal-btn" 
+              onClick={() => setShowErrorModal(false)}
+            >
+              Got It
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

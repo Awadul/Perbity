@@ -135,9 +135,19 @@ export const submitPayment = async (req, res, next) => {
     });
     
     if (pendingPayment) {
+      console.log('❌ User has pending payment:', pendingPayment._id);
+      console.log('   Pending is upgrade:', pendingPayment.isUpgrade);
+      console.log('   Current request is upgrade:', isUpgradeRequest);
+      
       // Delete uploaded file
       fs.unlinkSync(req.file.path);
-      return next(new ErrorResponse('You already have a pending payment waiting for approval', 400));
+      
+      // Provide specific error message
+      const errorMsg = pendingPayment.isUpgrade
+        ? 'You already have a pending package upgrade request waiting for admin approval. Please wait for it to be processed.'
+        : 'You already have a pending payment request waiting for admin approval. Please wait for it to be processed before submitting another request.';
+      
+      return next(new ErrorResponse(errorMsg, 400));
     }
     
     // Create payment data

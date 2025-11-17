@@ -77,8 +77,29 @@ const Login = () => {
       });
     } catch (error) {
       console.error('Login error:', error);
+      
+      // Extract error message from response
+      let errorMessage = 'Invalid email or password. Please try again.';
+      
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('HTTP error')) {
+        errorMessage = error.message;
+      }
+      
+      // Provide user-friendly error messages
+      if (errorMessage.includes('Invalid credentials') || errorMessage.includes('password')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+      } else if (errorMessage.includes('not found')) {
+        errorMessage = 'No account found with this email address. Please sign up first.';
+      } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      }
+      
       setErrors({ 
-        general: error.message || 'Invalid email or password. Please try again.' 
+        general: errorMessage
       });
     } finally {
       setIsSubmitting(false);

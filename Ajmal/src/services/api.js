@@ -55,7 +55,10 @@ class ApiService {
             window.location.href = '/login';
           }
         }
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        // Create error object with response data
+        const error = new Error(data.error || data.message || `HTTP error! status: ${response.status}`);
+        error.response = { data, status: response.status };
+        throw error;
       }
       
       return data;
@@ -124,7 +127,10 @@ class ApiService {
           localStorage.removeItem('isAuthenticated');
           window.location.href = '/login';
         }
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        // Create error object with response data
+        const error = new Error(data.error || data.message || `HTTP error! status: ${response.status}`);
+        error.response = { data, status: response.status };
+        throw error;
       }
       
       return data;
