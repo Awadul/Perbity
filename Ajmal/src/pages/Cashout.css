@@ -224,6 +224,125 @@
 }
 
 /* ========================================
+   PENDING CHECKOUT ALERT
+   ======================================== */
+
+.pending-checkout-alert {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.pending-checkout-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pending-icon {
+  font-size: 28px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+.pending-checkout-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e40af;
+}
+
+.pending-checkout-details {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.pending-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.pending-detail-row:last-child {
+  border-bottom: none;
+}
+
+.pending-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.pending-value {
+  font-size: 15px;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.pending-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pending-status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.pending-status.processing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.pending-checkout-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pending-note,
+.pending-warning {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.pending-note {
+  background: #d1fae5;
+  color: #065f46;
+  border-left: 4px solid #10b981;
+}
+
+.pending-warning {
+  background: #fee2e2;
+  color: #991b1b;
+  border-left: 4px solid #ef4444;
+}
+
+/* ========================================
    CASHOUT FORM
    ======================================== */
 

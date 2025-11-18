@@ -14,6 +14,8 @@ const Cashout = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [userBalance, setUserBalance] = useState(0);
+  const [pendingCheckout, setPendingCheckout] = useState(null);
+  const [loadingCheckouts, setLoadingCheckouts] = useState(true);
 
   // Check authentication and fetch balance
   useEffect(() => {
@@ -22,6 +24,7 @@ const Cashout = () => {
       return;
     }
     fetchUserBalance();
+    fetchPendingCheckouts();
   }, [isAuthenticated, user, navigate]);
 
   const fetchUserBalance = async () => {
@@ -35,6 +38,22 @@ const Cashout = () => {
       console.error('Failed to fetch balance:', error);
       // Fallback to context balance if API fails
       setUserBalance(user?.balance || 0);
+    }
+  };
+
+  const fetchPendingCheckouts = async () => {
+    try {
+      setLoadingCheckouts(true);
+      const response = await apiService.get('/checkouts/my-checkouts');
+      if (response.success && response.data) {
+        // Find pending checkout
+        const pending = response.data.find(checkout => checkout.status === 'pending' || checkout.status === 'processing');
+        setPendingCheckout(pending || null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch checkouts:', error);
+    } finally {
+      setLoadingCheckouts(false);
     }
   };
 
@@ -54,6 +73,14 @@ const Cashout = () => {
       qrCodePlaceholder: 'Upload your Binance receive QR code',
       qrCodeHelper: 'Take a screenshot of your Binance receive QR code',
       submitButton: 'Submit Withdrawal',
+      pendingTitle: 'Pending Withdrawal',
+      pendingAmount: 'Amount',
+      pendingStatus: 'Status',
+      pendingDate: 'Requested',
+      pendingNote: 'The withdrawal will be received within 12 hours',
+      pendingWarning: 'You can checkout again once this payment is completed',
+      statusPending: 'Pending',
+      statusProcessing: 'Processing',
       methods: {
         bank: 'Bank Transfer',
         easypaisa: 'EasyPaisa',
@@ -78,6 +105,14 @@ const Cashout = () => {
       qrCodePlaceholder: 'اپنا Binance وصول کرنے کا QR کوڈ اپ لوڈ کریں',
       qrCodeHelper: 'اپنے Binance وصول کرنے کے QR کوڈ کا اسکرین شاٹ لیں',
       submitButton: 'نکلوانے کی درخواست جمع کرائیں',
+      pendingTitle: 'زیر التواء نکلوانا',
+      pendingAmount: 'رقم',
+      pendingStatus: 'حالت',
+      pendingDate: 'درخواست کی تاریخ',
+      pendingNote: 'نکلوانا 12 گھنٹوں میں موصول ہوگا',
+      pendingWarning: 'آپ اس ادائیگی کے مکمل ہونے کے بعد دوبارہ نکلوا سکتے ہیں',
+      statusPending: 'زیر التواء',
+      statusProcessing: 'عمل درآمد میں',
       methods: {
         bank: 'بینک ٹرانسفر',
         easypaisa: 'ایزی پیسہ',
@@ -199,6 +234,40 @@ const Cashout = () => {
       <main className="cashout-main">
         <div className={`cashout-content ${language === 'ur' ? 'rtl' : ''}`}>
           
+          {/* Pending Checkout Alert */}
+          {!loadingCheckouts && pendingCheckout && (
+            <div className="pending-checkout-alert">
+              <div className="pending-checkout-header">
+                <span className="pending-icon">⏳</span>
+                <h3>{content[language].pendingTitle}</h3>
+              </div>
+              <div className="pending-checkout-details">
+                <div className="pending-detail-row">
+                  <span className="pending-label">{content[language].pendingAmount}:</span>
+                  <span className="pending-value">${pendingCheckout.amount.toFixed(2)}</span>
+                </div>
+                <div className="pending-detail-row">
+                  <span className="pending-label">{content[language].pendingStatus}:</span>
+                  <span className={`pending-status ${pendingCheckout.status}`}>
+                    {pendingCheckout.status === 'pending' 
+                      ? content[language].statusPending 
+                      : content[language].statusProcessing}
+                  </span>
+                </div>
+                <div className="pending-detail-row">
+                  <span className="pending-label">{content[language].pendingDate}:</span>
+                  <span className="pending-value">
+                    {new Date(pendingCheckout.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+              <div className="pending-checkout-notes">
+                <p className="pending-note">✅ {content[language].pendingNote}</p>
+                <p className="pending-warning">⚠️ {content[language].pendingWarning}</p>
+              </div>
+            </div>
+          )}
+          
           {/* Available Balance */}
           <div className="balance-display">
             <span className="balance-label">{content[language].availableBalance}</span>
@@ -251,7 +320,7 @@ const Cashout = () => {
                 min="20"
                 max="10000"
                 step="1"
-                disabled={userBalance < 20}
+                disabled={userBalance < 20 || pendingCheckout}
               />
               {errors.amount && <span className="error-text">{errors.amount}</span>}
             </div>
@@ -265,7 +334,7 @@ const Cashout = () => {
                   id="qrCodeImage"
                   accept="image/*"
                   onChange={handleQrCodeChange}
-                  disabled={userBalance < 20 || loading}
+                  disabled={userBalance < 20 || loading || pendingCheckout}
                   style={{ display: 'none' }}
                 />
                 <button
@@ -300,7 +369,7 @@ const Cashout = () => {
             <button 
               type="submit" 
               className="submit-btn"
-              disabled={userBalance < 20 || loading}
+              disabled={userBalance < 20 || loading || pendingCheckout}
             >
               {loading ? (language === 'en' ? 'Submitting...' : 'جمع ہو رہا ہے...') : content[language].submitButton}
             </button>
