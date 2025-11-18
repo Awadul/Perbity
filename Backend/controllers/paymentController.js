@@ -419,6 +419,23 @@ export const approvePayment = async (req, res, next) => {
       console.log(`\n❌ No Referred User Bonus (package is $50 - bonus excluded)`);
     }
     
+    // Reward the Referrer: Give 10% of payment amount to the person who referred this user (excluding $50 package)
+    if (user.referredBy && payment.amount > 50) {
+      const referrer = await User.findById(user.referredBy);
+      if (referrer) {
+        const referrerBonus = payment.amount * 0.10;
+        referrer.balance += referrerBonus;
+        referrer.totalEarnings += referrerBonus;
+        await referrer.save();
+        
+        console.log(`\n💎 Referrer Reward!`);
+        console.log(`   Referrer: ${referrer.name} (${referrer.email})`);
+        console.log(`   Referred User: ${user.name} purchased $${payment.amount}`);
+        console.log(`   Referrer Bonus (10%): $${referrerBonus.toFixed(2)}`);
+        console.log(`   Referrer New Balance: $${referrer.balance.toFixed(2)}`);
+      }
+    }
+    
     // Populate details
     await payment.populate('user', 'name email');
     
