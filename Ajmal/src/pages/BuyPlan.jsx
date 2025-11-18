@@ -116,6 +116,7 @@ const BuyPlan = () => {
 
   // Investment plans data from the image
   const allPlans = [
+    { amount: 50, dailyProfit: 1.5, dailyReturn: 3, adsIncluded: 1 },
     { amount: 100, dailyProfit: 3, dailyReturn: 3 },
     { amount: 200, dailyProfit: 6, dailyReturn: 3 },
     { amount: 300, dailyProfit: 9, dailyReturn: 3 },
@@ -257,6 +258,7 @@ const BuyPlan = () => {
                     <th>{t.amount}</th>
                     <th>{t.dailyProfit}</th>
                     <th>{t.dailyReturn}</th>
+                    <th>Bonus</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -266,6 +268,13 @@ const BuyPlan = () => {
                       <td>${plan.amount}</td>
                       <td>${plan.dailyProfit}</td>
                       <td>{plan.dailyReturn}%</td>
+                      <td>
+                        {plan.adsIncluded ? (
+                          <span className="ads-badge">🎯 {plan.adsIncluded} Ad</span>
+                        ) : (
+                          <span className="no-ads">-</span>
+                        )}
+                      </td>
                       <td>
                         <button
                           className={`select-plan-btn ${selectedPlan?.amount === plan.amount ? 'selected' : ''}`}
@@ -372,6 +381,12 @@ const BuyPlan = () => {
                 <span className="modal-label">{t.modalReturn}:</span>
                 <span className="modal-value">{selectedPlan.dailyReturn}%</span>
               </div>
+              {selectedPlan.adsIncluded && (
+                <div className="modal-row ads-bonus-row">
+                  <span className="modal-label">🎯 Ads Included:</span>
+                  <span className="modal-value ads-bonus">{selectedPlan.adsIncluded} Ad Credit</span>
+                </div>
+              )}
               {userProfile?.referredBy && (
                 <div className="modal-row bonus-row">
                   <span className="modal-label">{t.modalReferredBonus}:</span>

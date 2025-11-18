@@ -284,6 +284,25 @@
   box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
 }
 
+/* Ads Badge Styles */
+.ads-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+}
+
+.no-ads {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
 /* Features Section */
 .features-section {
   background: white;
@@ -517,6 +536,20 @@
 .modal-value.bonus {
   color: #d97706;
   font-size: 15px;
+}
+
+.modal-row.ads-bonus-row {
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  padding: 12px;
+  border-radius: 8px;
+  margin: 10px 0;
+  border: 1px solid #c4b5fd;
+}
+
+.modal-value.ads-bonus {
+  color: #7c3aed;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .modal-row.total-row {
