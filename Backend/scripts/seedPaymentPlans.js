@@ -16,12 +16,13 @@ const connectDB = async () => {
 };
 
 // Payment plans data - matching the frontend BuyPlan.jsx
+// Formula: For every $100 invested, user gets 3 ads ($1 per ad)
 const paymentPlansData = [
   {
     name: '$50 Investment',
     price: 50,
     duration: 30,
-    dailyAdsLimit: 1,
+    dailyAdsLimit: 1, // Special case: $50 gets 1 ad
     dailyProfit: 1.5,
     profitPercentage: 3,
     features: [
@@ -40,191 +41,191 @@ const paymentPlansData = [
     name: '$100 Investment',
     price: 100,
     duration: 30,
-    dailyAdsLimit: 10,
+    dailyAdsLimit: 3, // $100 / 100 * 3 = 3 ads
     dailyProfit: 3,
     profitPercentage: 3,
     features: [
       '3% daily guaranteed return',
       'Instant activation after payment',
+      '3 ads at $1 each',
       'Withdraw anytime 24/7',
-      'Bonus rewards on deposits',
       'Real-time profit tracking'
     ],
     adEarningRate: 1.0,
     isPopular: false,
     isActive: true,
-    description: '$100 investment package'
+    description: '$100 investment - 3 ads at $1 each'
   },
   {
     name: '$200 Investment',
     price: 200,
     duration: 30,
-    dailyAdsLimit: 20,
+    dailyAdsLimit: 6, // $200 / 100 * 3 = 6 ads
     dailyProfit: 6,
     profitPercentage: 3,
     features: [
       '3% daily guaranteed return',
       'Instant activation after payment',
+      '6 ads at $1 each',
       'Withdraw anytime 24/7',
-      'Bonus rewards on deposits',
       'Real-time profit tracking'
     ],
     adEarningRate: 1.0,
     isPopular: false,
     isActive: true,
-    description: '$200 investment package'
+    description: '$200 investment - 6 ads at $1 each'
   },
   {
     name: '$300 Investment',
     price: 300,
     duration: 30,
-    dailyAdsLimit: 30,
+    dailyAdsLimit: 9, // $300 / 100 * 3 = 9 ads
     dailyProfit: 9,
     profitPercentage: 3,
     features: [
       '3% daily guaranteed return',
       'Instant activation after payment',
+      '9 ads at $1 each',
       'Withdraw anytime 24/7',
-      'Bonus rewards on deposits',
       'Real-time profit tracking'
     ],
     adEarningRate: 1.0,
     isPopular: false,
     isActive: true,
-    description: '$300 investment package'
+    description: '$300 investment - 9 ads at $1 each'
   },
   {
     name: '$400 Investment',
     price: 400,
     duration: 30,
-    dailyAdsLimit: 40,
+    dailyAdsLimit: 12, // $400 / 100 * 3 = 12 ads
     dailyProfit: 12,
     profitPercentage: 3,
     features: [
       '3% daily guaranteed return',
       'Instant activation after payment',
+      '12 ads at $1 each',
       'Withdraw anytime 24/7',
-      'Bonus rewards on deposits',
       'Real-time profit tracking'
     ],
     adEarningRate: 1.0,
     isPopular: false,
     isActive: true,
-    description: '$400 investment package'
+    description: '$400 investment - 12 ads at $1 each'
   },
   {
     name: '$500 Investment',
     price: 500,
     duration: 30,
-    dailyAdsLimit: 50,
+    dailyAdsLimit: 15, // $500 / 100 * 3 = 15 ads
     dailyProfit: 15,
     profitPercentage: 3,
     features: [
       '3% daily guaranteed return',
       'Instant activation after payment',
+      '15 ads at $1 each',
       'Withdraw anytime 24/7',
-      'Bonus rewards on deposits',
       'Real-time profit tracking'
     ],
     adEarningRate: 1.0,
     isPopular: true,
     isActive: true,
-    description: '$500 investment package - Most Popular'
+    description: '$500 investment - 15 ads at $1 each'
   },
   {
     name: '$600 Investment',
     price: 600,
     duration: 30,
-    dailyAdsLimit: 60,
+    dailyAdsLimit: 18, // $600 / 100 * 3 = 18 ads
     dailyProfit: 18,
     profitPercentage: 3,
     features: [
       '3% daily guaranteed return',
       'Instant activation after payment',
+      '18 ads at $1 each',
       'Withdraw anytime 24/7',
-      'Bonus rewards on deposits',
       'Real-time profit tracking'
     ],
     adEarningRate: 1.0,
     isPopular: false,
     isActive: true,
-    description: '$600 investment package'
+    description: '$600 investment - 18 ads at $1 each'
   },
   {
     name: '$700 Investment',
     price: 700,
     duration: 30,
-    dailyAdsLimit: 70,
+    dailyAdsLimit: 21, // $700 / 100 * 3 = 21 ads
     dailyProfit: 21,
     profitPercentage: 3,
     features: [
       '3% daily guaranteed return',
       'Instant activation after payment',
+      '21 ads at $1 each',
       'Withdraw anytime 24/7',
-      'Bonus rewards on deposits',
       'Real-time profit tracking'
     ],
     adEarningRate: 1.0,
     isPopular: false,
     isActive: true,
-    description: '$700 investment package'
+    description: '$700 investment - 21 ads at $1 each'
   },
   {
     name: '$800 Investment',
     price: 800,
     duration: 30,
-    dailyAdsLimit: 80,
+    dailyAdsLimit: 24, // $800 / 100 * 3 = 24 ads
     dailyProfit: 24,
     profitPercentage: 3,
     features: [
       '3% daily guaranteed return',
       'Instant activation after payment',
+      '24 ads at $1 each',
       'Withdraw anytime 24/7',
-      'Bonus rewards on deposits',
       'Real-time profit tracking'
     ],
     adEarningRate: 1.0,
     isPopular: false,
     isActive: true,
-    description: '$800 investment package'
+    description: '$800 investment - 24 ads at $1 each'
   },
   {
     name: '$900 Investment',
     price: 900,
     duration: 30,
-    dailyAdsLimit: 90,
+    dailyAdsLimit: 27, // $900 / 100 * 3 = 27 ads
     dailyProfit: 27,
     profitPercentage: 3,
     features: [
       '3% daily guaranteed return',
       'Instant activation after payment',
+      '27 ads at $1 each',
       'Withdraw anytime 24/7',
-      'Bonus rewards on deposits',
       'Real-time profit tracking'
     ],
     adEarningRate: 1.0,
     isPopular: false,
     isActive: true,
-    description: '$900 investment package'
+    description: '$900 investment - 27 ads at $1 each'
   },
   {
     name: '$1000 Investment',
     price: 1000,
     duration: 30,
-    dailyAdsLimit: 100,
+    dailyAdsLimit: 30, // $1000 / 100 * 3 = 30 ads
     dailyProfit: 30,
     profitPercentage: 3,
     features: [
       '3% daily guaranteed return',
       'Instant activation after payment',
+      '30 ads at $1 each',
       'Withdraw anytime 24/7',
-      'Bonus rewards on deposits',
       'Real-time profit tracking'
     ],
     adEarningRate: 1.0,
     isPopular: false,
     isActive: true,
-    description: '$1000 investment package'
+    description: '$1000 investment - 30 ads at $1 each'
   }
 ];
 
