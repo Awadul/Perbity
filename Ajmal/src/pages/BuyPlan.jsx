@@ -197,8 +197,8 @@ const BuyPlan = () => {
               <div className="bonus-card-icon">💰</div>
               <div className="bonus-card-content">
                 <h4>Your Purchase Bonus</h4>
-                <p className="bonus-amount">$10 Instant Credit</p>
-                <span className="bonus-desc">Get $10 added to your balance when you buy any package</span>
+                <p className="bonus-amount">10% Instant Credit</p>
+                <span className="bonus-desc">Get 10% of your investment added to your balance (packages above $50)</span>
               </div>
             </div>
             
@@ -390,12 +390,12 @@ const BuyPlan = () => {
               {userProfile?.referredBy && selectedPlan.amount > 50 && (
                 <div className="modal-row bonus-row">
                   <span className="modal-label">{t.modalReferredBonus}:</span>
-                  <span className="modal-value bonus">$10</span>
+                  <span className="modal-value bonus">${(selectedPlan.amount * 0.10).toFixed(2)}</span>
                 </div>
               )}
               <div className="modal-row total-row">
                 <span className="modal-label">{t.modalTotal}:</span>
-                <span className="modal-value total">${userProfile?.referredBy && selectedPlan.amount > 50 ? selectedPlan.amount + 10 : selectedPlan.amount}</span>
+                <span className="modal-value total">${userProfile?.referredBy && selectedPlan.amount > 50 ? (selectedPlan.amount + selectedPlan.amount * 0.10).toFixed(2) : selectedPlan.amount}</span>
               </div>
             </div>
             <div className="modal-actions">
