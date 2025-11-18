@@ -400,14 +400,27 @@ export const approvePayment = async (req, res, next) => {
     }
     
     // Bonus for Referred User: Give 10% of payment amount as bonus (excluding $50 package)
+    // For upgrades, bonus is calculated on the additional amount only
     if (user.referredBy && payment.amount > 50) {
+      // Calculate bonus amount based on additional investment for upgrades
+      let bonusCalculationAmount = payment.amount;
+      
+      if (payment.isUpgrade && payment.previousAmount) {
+        bonusCalculationAmount = payment.amount - payment.previousAmount;
+        console.log(`\n🔄 Upgrade Detected - Calculating bonus on additional amount only`);
+        console.log(`   New Amount: $${payment.amount}`);
+        console.log(`   Previous Amount: $${payment.previousAmount}`);
+        console.log(`   Additional Amount: $${bonusCalculationAmount}`);
+      }
+      
       // Calculate 10% bonus
-      const bonusAmount = Number((payment.amount * 0.10).toFixed(2));
+      const bonusAmount = Number((bonusCalculationAmount * 0.10).toFixed(2));
       
       console.log(`\n🎉 Calculating Referred User Bonus...`);
       console.log(`   Payment Amount: $${payment.amount}`);
+      console.log(`   Bonus Calculation Amount: $${bonusCalculationAmount}`);
       console.log(`   Payment Amount Type: ${typeof payment.amount}`);
-      console.log(`   Calculation: ${payment.amount} * 0.10 = ${bonusAmount}`);
+      console.log(`   Calculation: ${bonusCalculationAmount} * 0.10 = ${bonusAmount}`);
       
       // Give 10% bonus to the referred user (buyer)
       user.balance += bonusAmount;
@@ -423,14 +436,26 @@ export const approvePayment = async (req, res, next) => {
     }
     
     // Reward the Referrer: Give 10% of payment amount to the person who referred this user (excluding $50 package)
+    // For upgrades, bonus is calculated on the additional amount only
     if (user.referredBy && payment.amount > 50) {
       const referrer = await User.findById(user.referredBy);
       if (referrer) {
-        const referrerBonus = Number((payment.amount * 0.10).toFixed(2));
+        // Calculate bonus amount based on additional investment for upgrades
+        let bonusCalculationAmount = payment.amount;
+        
+        if (payment.isUpgrade && payment.previousAmount) {
+          bonusCalculationAmount = payment.amount - payment.previousAmount;
+        }
+        
+        const referrerBonus = Number((bonusCalculationAmount * 0.10).toFixed(2));
         
         console.log(`\n💎 Calculating Referrer Reward...`);
         console.log(`   Payment Amount: $${payment.amount}`);
-        console.log(`   Calculation: ${payment.amount} * 0.10 = ${referrerBonus}`);
+        if (payment.isUpgrade && payment.previousAmount) {
+          console.log(`   Previous Amount: $${payment.previousAmount}`);
+          console.log(`   Additional Amount: $${bonusCalculationAmount}`);
+        }
+        console.log(`   Calculation: ${bonusCalculationAmount} * 0.10 = ${referrerBonus}`);
         
         referrer.balance += referrerBonus;
         referrer.totalEarnings += referrerBonus;
