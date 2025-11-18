@@ -402,7 +402,12 @@ export const approvePayment = async (req, res, next) => {
     // Bonus for Referred User: Give 10% of payment amount as bonus (excluding $50 package)
     if (user.referredBy && payment.amount > 50) {
       // Calculate 10% bonus
-      const bonusAmount = payment.amount * 0.10;
+      const bonusAmount = Number((payment.amount * 0.10).toFixed(2));
+      
+      console.log(`\n🎉 Calculating Referred User Bonus...`);
+      console.log(`   Payment Amount: $${payment.amount}`);
+      console.log(`   Payment Amount Type: ${typeof payment.amount}`);
+      console.log(`   Calculation: ${payment.amount} * 0.10 = ${bonusAmount}`);
       
       // Give 10% bonus to the referred user (buyer)
       user.balance += bonusAmount;
@@ -410,9 +415,7 @@ export const approvePayment = async (req, res, next) => {
       
       await user.save();
       
-      console.log(`\n🎉 Referred User Bonus!`);
       console.log(`   User: ${user.name} (${user.email})`);
-      console.log(`   Payment Amount: $${payment.amount}`);
       console.log(`   Bonus Amount (10%): $${bonusAmount.toFixed(2)}`);
       console.log(`   New Balance: $${user.balance.toFixed(2)}`);
     } else if (user.referredBy && payment.amount === 50) {
@@ -423,12 +426,16 @@ export const approvePayment = async (req, res, next) => {
     if (user.referredBy && payment.amount > 50) {
       const referrer = await User.findById(user.referredBy);
       if (referrer) {
-        const referrerBonus = payment.amount * 0.10;
+        const referrerBonus = Number((payment.amount * 0.10).toFixed(2));
+        
+        console.log(`\n💎 Calculating Referrer Reward...`);
+        console.log(`   Payment Amount: $${payment.amount}`);
+        console.log(`   Calculation: ${payment.amount} * 0.10 = ${referrerBonus}`);
+        
         referrer.balance += referrerBonus;
         referrer.totalEarnings += referrerBonus;
         await referrer.save();
         
-        console.log(`\n💎 Referrer Reward!`);
         console.log(`   Referrer: ${referrer.name} (${referrer.email})`);
         console.log(`   Referred User: ${user.name} purchased $${payment.amount}`);
         console.log(`   Referrer Bonus (10%): $${referrerBonus.toFixed(2)}`);
