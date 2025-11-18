@@ -387,7 +387,7 @@ const BuyPlan = () => {
                   <span className="modal-value ads-bonus">{selectedPlan.adsIncluded} Ad Credit</span>
                 </div>
               )}
-              {userProfile?.referredBy && (
+              {userProfile?.referredBy && selectedPlan.amount > 50 && (
                 <div className="modal-row bonus-row">
                   <span className="modal-label">{t.modalReferredBonus}:</span>
                   <span className="modal-value bonus">$10</span>
@@ -395,7 +395,7 @@ const BuyPlan = () => {
               )}
               <div className="modal-row total-row">
                 <span className="modal-label">{t.modalTotal}:</span>
-                <span className="modal-value total">${userProfile?.referredBy ? selectedPlan.amount + 10 : selectedPlan.amount}</span>
+                <span className="modal-value total">${userProfile?.referredBy && selectedPlan.amount > 50 ? selectedPlan.amount + 10 : selectedPlan.amount}</span>
               </div>
             </div>
             <div className="modal-actions">
