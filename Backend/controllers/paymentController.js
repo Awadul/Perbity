@@ -399,42 +399,6 @@ export const approvePayment = async (req, res, next) => {
       console.log(`   Total Deposits: $${user.totalDeposits.toFixed(2)}`);
     }
     
-    // Bonus for Referred User: Give 10% of payment amount as bonus (excluding $50 package)
-    // For upgrades, bonus is calculated on the additional amount only
-    if (user.referredBy && payment.amount > 50) {
-      // Calculate bonus amount based on additional investment for upgrades
-      let bonusCalculationAmount = payment.amount;
-      
-      if (payment.isUpgrade && payment.previousAmount) {
-        bonusCalculationAmount = payment.amount - payment.previousAmount;
-        console.log(`\n🔄 Upgrade Detected - Calculating bonus on additional amount only`);
-        console.log(`   New Amount: $${payment.amount}`);
-        console.log(`   Previous Amount: $${payment.previousAmount}`);
-        console.log(`   Additional Amount: $${bonusCalculationAmount}`);
-      }
-      
-      // Calculate 10% bonus
-      const bonusAmount = Number((bonusCalculationAmount * 0.10).toFixed(2));
-      
-      console.log(`\n🎉 Calculating Referred User Bonus...`);
-      console.log(`   Payment Amount: $${payment.amount}`);
-      console.log(`   Bonus Calculation Amount: $${bonusCalculationAmount}`);
-      console.log(`   Payment Amount Type: ${typeof payment.amount}`);
-      console.log(`   Calculation: ${bonusCalculationAmount} * 0.10 = ${bonusAmount}`);
-      
-      // Give 10% bonus to the referred user (buyer)
-      user.balance += bonusAmount;
-      user.totalEarnings += bonusAmount;
-      
-      await user.save();
-      
-      console.log(`   User: ${user.name} (${user.email})`);
-      console.log(`   Bonus Amount (10%): $${bonusAmount.toFixed(2)}`);
-      console.log(`   New Balance: $${user.balance.toFixed(2)}`);
-    } else if (user.referredBy && payment.amount === 50) {
-      console.log(`\n❌ No Referred User Bonus (package is $50 - bonus excluded)`);
-    }
-    
     // Reward the Referrer: Give 10% of payment amount to the person who referred this user (excluding $50 package)
     // For upgrades, bonus is calculated on the additional amount only
     if (user.referredBy && payment.amount > 50) {
