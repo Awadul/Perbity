@@ -194,20 +194,20 @@ const BuyPlan = () => {
           
           <div className="bonus-cards">
             <div className="bonus-card">
-              <div className="bonus-card-icon">👥</div>
+              <div className="bonus-card-icon">💎</div>
               <div className="bonus-card-content">
-                <h4>Invite Friends</h4>
-                <p className="bonus-amount">$20 Per Referral</p>
-                <span className="bonus-desc">Earn $20 when someone signs up using your referral link</span>
+                <h4>Referral Rewards</h4>
+                <p className="bonus-amount">$20 Per Purchase</p>
+                <span className="bonus-desc">Earn $20 every time your referrals purchase a package</span>
               </div>
             </div>
             
             <div className="bonus-card">
-              <div className="bonus-card-icon">💎</div>
+              <div className="bonus-card-icon">👥</div>
               <div className="bonus-card-content">
-                <h4>Referral Rewards</h4>
-                <p className="bonus-amount">10% Commission</p>
-                <span className="bonus-desc">Earn 10% when your referrals purchase investment packages</span>
+                <h4>Build Your Team</h4>
+                <p className="bonus-amount">Unlimited Earnings</p>
+                <span className="bonus-desc">Invite unlimited members and earn $20 per purchase they make</span>
               </div>
             </div>
           </div>

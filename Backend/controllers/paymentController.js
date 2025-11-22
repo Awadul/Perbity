@@ -399,35 +399,21 @@ export const approvePayment = async (req, res, next) => {
       console.log(`   Total Deposits: $${user.totalDeposits.toFixed(2)}`);
     }
     
-    // Reward the Referrer: Give 10% of payment amount to the person who referred this user (excluding $50 package)
-    // For upgrades, bonus is calculated on the additional amount only
+    // Reward the Referrer: Give $20 for every referral payment (excluding $50 package)
     if (user.referredBy && payment.amount > 50) {
       const referrer = await User.findById(user.referredBy);
       if (referrer) {
-        // Calculate bonus amount based on additional investment for upgrades
-        let bonusCalculationAmount = payment.amount;
+        const referrerBonus = 20;
         
-        if (payment.isUpgrade && payment.previousAmount) {
-          bonusCalculationAmount = payment.amount - payment.previousAmount;
-        }
-        
-        const referrerBonus = Number((bonusCalculationAmount * 0.10).toFixed(2));
-        
-        console.log(`\n💎 Calculating Referrer Reward...`);
-        console.log(`   Payment Amount: $${payment.amount}`);
-        if (payment.isUpgrade && payment.previousAmount) {
-          console.log(`   Previous Amount: $${payment.previousAmount}`);
-          console.log(`   Additional Amount: $${bonusCalculationAmount}`);
-        }
-        console.log(`   Calculation: ${bonusCalculationAmount} * 0.10 = ${referrerBonus}`);
+        console.log(`\n💎 Referrer Reward!`);
+        console.log(`   Referrer: ${referrer.name} (${referrer.email})`);
+        console.log(`   Referred User: ${user.name} purchased $${payment.amount}`);
+        console.log(`   Referrer Bonus: $${referrerBonus.toFixed(2)}`);
         
         referrer.balance += referrerBonus;
         referrer.totalEarnings += referrerBonus;
         await referrer.save();
         
-        console.log(`   Referrer: ${referrer.name} (${referrer.email})`);
-        console.log(`   Referred User: ${user.name} purchased $${payment.amount}`);
-        console.log(`   Referrer Bonus (10%): $${referrerBonus.toFixed(2)}`);
         console.log(`   Referrer New Balance: $${referrer.balance.toFixed(2)}`);
       }
     }
