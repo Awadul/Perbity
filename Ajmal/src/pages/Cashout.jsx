@@ -63,12 +63,12 @@ const Cashout = () => {
       subtitle: 'Withdraw your earnings',
       availableBalance: 'Available Balance',
       infoTitle: 'Withdrawal Information',
-      infoText: 'You can withdraw from $20 up to $10,000. Minimum balance required: $20',
-      minAmount: 'Minimum: $20',
+      infoText: 'You can withdraw from $30 up to $10,000. Minimum balance required: $30',
+      minAmount: 'Minimum: $30',
       maxAmount: 'Maximum: $10,000',
       available247: 'Available 24/7',
       amountLabel: 'Withdrawal Amount',
-      amountPlaceholder: 'Enter amount ($20 - $10,000)',
+      amountPlaceholder: 'Enter amount ($30 - $10,000)',
       qrCodeLabel: 'Your Binance QR Code',
       qrCodePlaceholder: 'Upload your Binance receive QR code',
       qrCodeHelper: 'Take a screenshot of your Binance receive QR code',
@@ -95,12 +95,12 @@ const Cashout = () => {
       subtitle: 'اپنی کمائی نکالیں',
       availableBalance: 'دستیاب بیلنس',
       infoTitle: 'نکلوانے کی معلومات',
-      infoText: 'آپ $20 سے لے کر $10,000 تک نکال سکتے ہیں۔ کم از کم بیلنس: $20',
-      minAmount: 'کم از کم: $20',
+      infoText: 'آپ $30 سے لے کر $10,000 تک نکال سکتے ہیں۔ کم از کم بیلنس: $30',
+      minAmount: 'کم از کم: $30',
       maxAmount: 'زیادہ سے زیادہ: $10,000',
       available247: '24/7 دستیاب',
       amountLabel: 'نکلوانے کی رقم',
-      amountPlaceholder: 'رقم درج کریں ($20 - $10,000)',
+      amountPlaceholder: 'رقم درج کریں ($30 - $10,000)',
       qrCodeLabel: 'آپ کا Binance QR کوڈ',
       qrCodePlaceholder: 'اپنا Binance وصول کرنے کا QR کوڈ اپ لوڈ کریں',
       qrCodeHelper: 'اپنے Binance وصول کرنے کے QR کوڈ کا اسکرین شاٹ لیں',
@@ -164,8 +164,8 @@ const Cashout = () => {
     // Validate amount
     if (!amount) {
       newErrors.amount = language === 'en' ? 'Amount is required' : 'رقم درج کرنا ضروری ہے';
-    } else if (numAmount < 20) {
-      newErrors.amount = language === 'en' ? 'Minimum withdrawal is $20' : 'کم از کم نکلوانا $20 ہے';
+    } else if (numAmount < 30) {
+      newErrors.amount = language === 'en' ? 'Minimum withdrawal is $30' : 'کم از کم نکلوانا $30 ہے';
     } else if (numAmount > 10000) {
       newErrors.amount = language === 'en' ? 'Maximum withdrawal is $10,000' : 'زیادہ سے زیادہ نکلوانا $10,000 ہے';
     } else if (numAmount > userBalance) {
@@ -275,13 +275,13 @@ const Cashout = () => {
           </div>
 
           {/* Minimum balance warning */}
-          {userBalance < 20 && (
+          {userBalance < 30 && (
             <div className="warning-card">
               <div className="warning-icon">⚠️</div>
               <p className="warning-text">
                 {language === 'en'
-                  ? `You need at least $20 to withdraw. Current balance: $${userBalance.toFixed(2)}`
-                  : `نکلوانے کے لیے کم از کم $20 کی ضرورت ہے۔ موجودہ بیلنس: $${userBalance.toFixed(2)}`}
+                  ? `You need at least $30 to withdraw. Current balance: $${userBalance.toFixed(2)}`
+                  : `نکلوانے کے لیے کم از کم $30 کی ضرورت ہے۔ موجودہ بیلنس: $${userBalance.toFixed(2)}`}
               </p>
             </div>
           )}
@@ -317,10 +317,10 @@ const Cashout = () => {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder={content[language].amountPlaceholder}
-                min="20"
+                min="30"
                 max="10000"
                 step="1"
-                disabled={userBalance < 20 || pendingCheckout}
+                disabled={userBalance < 30 || pendingCheckout}
               />
               {errors.amount && <span className="error-text">{errors.amount}</span>}
             </div>
@@ -334,7 +334,7 @@ const Cashout = () => {
                   id="qrCodeImage"
                   accept="image/*"
                   onChange={handleQrCodeChange}
-                  disabled={userBalance < 20 || loading || pendingCheckout}
+                  disabled={userBalance < 30 || loading || pendingCheckout}
                   style={{ display: 'none' }}
                 />
                 <button
