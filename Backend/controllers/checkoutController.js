@@ -27,6 +27,15 @@ export const createCheckout = async (req, res, next) => {
       return next(new ErrorResponse('Invalid amount', 400));
     }
     
+    // Check minimum withdrawal amount ($30)
+    if (numAmount < 30) {
+      // Delete uploaded file if exists
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
+      return next(new ErrorResponse('Minimum withdrawal amount is $30', 400));
+    }
+    
     // Check if QR code image was uploaded (required for Binance)
     if (paymentMethod === 'binance' && !req.file) {
       return next(new ErrorResponse('Please upload your Binance QR code', 400));
